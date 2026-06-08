@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: emc-pintura-cliente
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run start:public
+    envVars:
+      - key: PUBLIC_CLIENT_ONLY
+        value: "true"
+      - key: OPENAI_VISION_MODEL
+        value: gpt-4.1-mini
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: ADMIN_PANEL_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: ALERT_EMAIL_FROM
+        sync: false
+      - key: ALERT_EMAIL_TO
+        sync: false

@@ -1,0 +1,18 @@
+{
+  "name": "emc-pintura-v1",
+  "version": "1.0.0",
+  "description": "V1 funcional de EMC Pintura: app cliente, panel administrador y backend local.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:public": "PUBLIC_CLIENT_ONLY=true node server.js",
+    "check": "node --check server.js && node --check public/cliente/app.js"
+  },
+  "keywords": [
+    "emc",
+    "pintura",
+    "cotizador"
+  ],
+  "author": "EMC",
+  "license": "UNLICENSED"
+}
