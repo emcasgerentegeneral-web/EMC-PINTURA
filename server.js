@@ -524,11 +524,13 @@ function serveStatic(req, res) {
   }
 
   const ext = path.extname(filePath).toLowerCase();
+  const content = fs.readFileSync(filePath);
   res.writeHead(200, {
     'Content-Type': mimeTypes[ext] || 'application/octet-stream',
-    'Cache-Control': 'no-store'
+    'Cache-Control': 'no-store',
+    'Content-Length': content.length
   });
-  fs.createReadStream(filePath).pipe(res);
+  res.end(content);
 }
 
 async function handleApi(req, res) {
