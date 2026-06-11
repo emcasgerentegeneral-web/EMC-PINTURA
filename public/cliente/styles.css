@@ -3326,3 +3326,81 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Contrast correction: keep white text on dark blue only */
+.home {
+  color: #fff;
+  background:
+    linear-gradient(90deg, rgba(5, 20, 38, 0.99) 0%, rgba(7, 29, 54, 0.96) 48%, rgba(11, 43, 76, 0.88) 72%, rgba(16, 65, 111, 0.62) 100%),
+    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) cover no-repeat,
+    var(--blue-950);
+}
+
+.home h1,
+.home .home-tagline,
+.home .client-method-card strong {
+  color: #fff;
+}
+
+.home .division,
+.home .client-method > span {
+  color: #ffd84a;
+}
+
+.home .benefits {
+  border-color: rgba(203, 214, 227, 0.2);
+  background: rgba(5, 20, 38, 0.36);
+}
+
+.home .benefits span,
+.home .client-method-card em {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.home .client-method-card {
+  border-color: rgba(203, 214, 227, 0.22);
+  background: rgba(5, 20, 38, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.screen,
+.app-shell {
+  background:
+    linear-gradient(180deg, #e8f1fa 0%, #f4f7fa 240px, #eef3f8 100%);
+}
+
+.card,
+.quote-document,
+.quote-section,
+.client-check,
+.service-choice-card,
+.success-summary,
+.material-summary > div {
+  color: var(--gray-900);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f7fafd 100%);
+}
+
+.card h2,
+.card h3,
+.quote-section h3,
+.service-choice-card h4,
+.client-path-step strong {
+  color: var(--blue-900);
+}
+
+.site-header,
+.topbar.site-header {
+  color: #fff;
+  background:
+    linear-gradient(90deg, var(--blue-950) 0%, var(--blue-900) 45%, var(--blue-800) 78%, #1e3448 100%) !important;
+}
+
+@media (max-width: 760px) {
+  .home {
+    background:
+      linear-gradient(180deg, rgba(5, 20, 38, 0.9) 0%, rgba(7, 29, 54, 0.98) 46%, rgba(11, 43, 76, 0.98) 100%),
+      url("/assets/emc-uniforme-interior.png") center top / cover no-repeat,
+      var(--blue-950);
+  }
+}
