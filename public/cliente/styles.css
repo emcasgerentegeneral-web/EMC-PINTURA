@@ -3012,3 +3012,317 @@ textarea:focus {
       var(--navy);
   }
 }
+
+/* Action buttons: make primary choices feel clearly tappable */
+.btn {
+  position: relative;
+  min-height: 54px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-weight: 950;
+  line-height: 1.1;
+  text-decoration: none;
+  box-shadow:
+    0 10px 20px rgba(7, 29, 54, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.btn::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.78;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 30px rgba(7, 29, 54, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.btn:hover::after,
+.btn:focus-visible::after {
+  transform: translateX(3px) rotate(45deg);
+  opacity: 1;
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 7px 14px rgba(7, 29, 54, 0.14);
+}
+
+.btn:disabled,
+.btn[disabled] {
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary {
+  border-color: #ffcf1f;
+  background:
+    linear-gradient(180deg, #ffe15a 0%, #ffd21f 48%, #f1b800 100%);
+  color: #071d36;
+  box-shadow:
+    0 16px 30px rgba(255, 196, 20, 0.3),
+    0 8px 16px rgba(7, 29, 54, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  box-shadow:
+    0 20px 36px rgba(255, 196, 20, 0.38),
+    0 10px 20px rgba(7, 29, 54, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.btn-secondary,
+.btn-dark {
+  border-color: rgba(7, 29, 54, 0.9);
+  background:
+    linear-gradient(180deg, #12395f 0%, #071d36 100%);
+  color: #fff;
+}
+
+.home .btn-secondary,
+.home .btn-light,
+.site-header .btn-secondary,
+.site-header .btn-light {
+  border-color: rgba(255, 255, 255, 0.64);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.07) 100%);
+  color: #fff;
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.btn-light,
+.btn-ghost {
+  border-color: #c8d6e6;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #eef5fc 100%);
+  color: #071d36;
+}
+
+.site-nav button {
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.site-nav button:hover,
+.site-nav button:focus-visible {
+  transform: translateY(-2px);
+  box-shadow:
+    0 13px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+@media (max-width: 760px) {
+  .btn {
+    width: 100%;
+    min-height: 56px;
+    padding: 15px 18px;
+  }
+
+  .button-stack .btn {
+    min-width: 0;
+  }
+}
+
+/* Blue and gray visual system */
+:root {
+  --blue-950: #051426;
+  --blue-900: #071d36;
+  --blue-800: #0b2b4c;
+  --blue-700: #10416f;
+  --blue-600: #1c5d91;
+  --blue-100: #e8f1fa;
+  --gray-900: #182231;
+  --gray-700: #3f4f63;
+  --gray-600: #5e6b7b;
+  --gray-300: #cbd6e3;
+  --gray-200: #dde6f0;
+  --gray-100: #f4f7fa;
+}
+
+body {
+  background:
+    linear-gradient(180deg, var(--blue-950) 0%, #102b45 42%, var(--gray-100) 100%);
+}
+
+.home {
+  background:
+    linear-gradient(90deg, rgba(5, 20, 38, 0.98) 0%, rgba(7, 29, 54, 0.92) 42%, rgba(16, 65, 111, 0.62) 72%, rgba(63, 79, 99, 0.3) 100%),
+    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) cover no-repeat,
+    var(--blue-950);
+}
+
+.site-header,
+.topbar.site-header {
+  background:
+    linear-gradient(90deg, var(--blue-950) 0%, var(--blue-900) 42%, var(--blue-800) 72%, #263849 100%) !important;
+}
+
+.screen {
+  background:
+    linear-gradient(180deg, rgba(232, 241, 250, 0.7) 0%, rgba(244, 247, 250, 0) 260px);
+}
+
+.card,
+.quote-section,
+.client-check,
+.success-summary,
+.service-choice-card,
+.material-summary > div {
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+  border-color: var(--gray-200);
+}
+
+.muted,
+.service-choice-card p,
+.quote-section small,
+.client-path-step small {
+  color: var(--gray-600);
+}
+
+.client-path-step {
+  border-color: var(--gray-200);
+  background:
+    linear-gradient(180deg, #ffffff 0%, var(--blue-100) 100%);
+}
+
+.client-path-step span {
+  background: var(--gray-200);
+  color: var(--blue-800);
+}
+
+.client-path-step.done span,
+.client-path-step.active span {
+  background: linear-gradient(180deg, #ffd84a 0%, #f1b800 100%);
+  color: var(--blue-950);
+}
+
+.btn strong {
+  display: block;
+  color: inherit;
+  font-size: 15px;
+  line-height: 1.05;
+}
+
+.btn small {
+  display: block;
+  color: currentColor;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.2;
+  opacity: 0.78;
+}
+
+.button-stack .btn,
+.actions .btn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 10px;
+  row-gap: 3px;
+  align-content: center;
+  justify-items: center;
+}
+
+.button-stack .btn strong,
+.button-stack .btn small,
+.actions .btn strong,
+.actions .btn small {
+  grid-column: 1;
+}
+
+.button-stack .btn::after,
+.actions .btn::after {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.btn-soft-action::after {
+  display: none;
+}
+
+.btn-hero {
+  min-height: 66px;
+  align-items: center;
+}
+
+.btn-primary {
+  border-color: #f7c516;
+  background:
+    linear-gradient(180deg, #ffe36a 0%, #ffd21f 48%, #e6ad00 100%);
+  color: var(--blue-950);
+}
+
+.btn-secondary,
+.btn-dark {
+  border-color: #1f5f91;
+  background:
+    linear-gradient(180deg, var(--blue-700) 0%, var(--blue-800) 52%, var(--blue-900) 100%);
+  color: #fff;
+}
+
+.btn-light,
+.btn-ghost {
+  border-color: var(--gray-300);
+  background:
+    linear-gradient(180deg, #ffffff 0%, var(--gray-100) 48%, var(--blue-100) 100%);
+  color: var(--blue-900);
+}
+
+.btn-soft-action {
+  min-height: 46px;
+  box-shadow: none;
+}
+
+.home .btn-light,
+.home .btn-secondary {
+  border-color: rgba(203, 214, 227, 0.72);
+  background:
+    linear-gradient(180deg, rgba(28, 93, 145, 0.62) 0%, rgba(11, 43, 76, 0.82) 100%);
+}
+
+.home .btn-secondary {
+  background:
+    linear-gradient(180deg, rgba(94, 107, 123, 0.7) 0%, rgba(24, 34, 49, 0.86) 100%);
+}
+
+.quote-actions {
+  grid-template-columns: 1.4fr 1fr 1fr;
+  align-items: stretch;
+}
+
+.recommendation-actions {
+  grid-template-columns: 1.25fr 1fr;
+}
+
+@media (max-width: 760px) {
+  .home {
+    background:
+      linear-gradient(180deg, rgba(5, 20, 38, 0.78) 0%, rgba(7, 29, 54, 0.96) 42%, rgba(16, 65, 111, 0.98) 100%),
+      url("/assets/emc-uniforme-interior.png") center top / cover no-repeat,
+      var(--blue-950);
+  }
+
+  .quote-actions,
+  .recommendation-actions {
+    grid-template-columns: 1fr;
+  }
+}

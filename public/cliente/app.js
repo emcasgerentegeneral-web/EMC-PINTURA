@@ -214,6 +214,10 @@ function customerMinimumLevel() {
   return scoreDiagnostic();
 }
 
+function photoReviewPending() {
+  return state.quote.photos.length >= 4 && !state.photoAnalysis;
+}
+
 function recommendationReasons() {
   const access = autoAccess();
   const reasons = [];
@@ -450,9 +454,18 @@ function home() {
         </div>
         ${homeProcess()}
         <div class="button-stack">
-          <button class="btn btn-primary" data-action="quote">Cotizar servicio</button>
-          <button class="btn btn-secondary" data-action="work">Forma parte de la Red EMC</button>
-          <button class="btn btn-light" data-action="how">Cómo funciona</button>
+          <button class="btn btn-primary btn-hero" data-action="quote">
+            <strong>Empezar cotización</strong>
+            <small>Recibe precio estimado con tus fotos</small>
+          </button>
+          <button class="btn btn-light" data-action="how">
+            <strong>Ver cómo funciona</strong>
+            <small>Conoce los pasos antes de cotizar</small>
+          </button>
+          <button class="btn btn-secondary" data-action="work">
+            <strong>Soy pintor</strong>
+            <small>Quiero entrar a la Red EMC</small>
+          </button>
         </div>
       </div>
     </section>
@@ -761,11 +774,17 @@ function stepRecommendation(calc) {
         <p>${recommended.short}</p>
       </div>
       ${calc.recommendedLevel === 'premium' ? premiumRecommendationDetail() : ''}
-      <button class="btn btn-ghost" data-modal="recommendation" type="button">Explicación de por qué el nivel</button>
-      <p class="service-change-question">¿Deseas escoger otro nivel de servicio?</p>
+      <button class="btn btn-ghost btn-soft-action" data-modal="recommendation" type="button">Ver explicación del nivel</button>
+      <p class="service-change-question">Siguiente paso recomendado</p>
       <div class="actions recommendation-actions">
-        <button class="btn btn-primary" data-action="accept-recommendation" type="button">Aceptar recomendación de sistema EMC</button>
-        <button class="btn btn-ghost" data-action="choose-service" type="button">Escoger otro tipo de servicio</button>
+        <button class="btn btn-primary btn-hero" data-action="accept-recommendation" type="button">
+          <strong>Sí, usar esta recomendación</strong>
+          <small>Continuar con el nivel sugerido</small>
+        </button>
+        <button class="btn btn-ghost" data-action="choose-service" type="button">
+          <strong>Comparar niveles</strong>
+          <small>Elegir otro alcance por presupuesto</small>
+        </button>
       </div>
       ${state.showServiceOptions ? serviceChoicePanel(calc) : ''}
       <div class="actions single">
@@ -1069,12 +1088,21 @@ function stepSummary(calc) {
         </label>
       </div>
       <div class="actions quote-actions">
-        <button class="btn btn-ghost" data-action="prev">Modificar</button>
-        <button class="btn btn-ghost" data-action="print-pdf">Imprimir / guardar PDF</button>
-        <button class="btn btn-primary" data-action="accept">Aceptar cotización</button>
+        <button class="btn btn-primary btn-hero" data-action="accept">
+          <strong>Aceptar y enviar solicitud</strong>
+          <small>EMC revisa y confirma agenda</small>
+        </button>
+        <button class="btn btn-ghost" data-action="print-pdf">
+          <strong>Guardar PDF</strong>
+          <small>Descargar o imprimir cotización</small>
+        </button>
+        <button class="btn btn-ghost" data-action="prev">
+          <strong>Corregir datos</strong>
+          <small>Volver al paso anterior</small>
+        </button>
       </div>
       <div class="actions single">
-        <button class="btn btn-ghost" data-action="home">Cancelar</button>
+        <button class="btn btn-ghost btn-soft-action" data-action="home">Salir sin enviar</button>
       </div>
     </div>
   `;
@@ -1254,7 +1282,10 @@ function navActions(nextLabel = 'Continuar') {
   return `
     <div class="actions">
       <button class="btn btn-ghost" data-action="prev">Atrás</button>
-      <button class="btn btn-primary" data-action="next">${nextLabel}</button>
+      <button class="btn btn-primary" data-action="next">
+        <strong>${nextLabel}</strong>
+        <small>Ir al siguiente paso</small>
+      </button>
     </div>
   `;
 }
@@ -1631,6 +1662,7 @@ function validationMessage() {
     if (Number(q.project.heightMeters) > 15) return 'Revisa la altura: parece demasiado alta para una cotización rápida.';
   }
   if (state.step === 2 && state.quote.photos.length < 4) return 'Sube las 4 fotos mínimas para que EMC pueda revisar el alcance.';
+  if (state.step === 2 && photoReviewPending()) return 'Espera unos segundos: el sistema está terminando la revisión de fotos antes de recomendar un nivel.';
   if (state.step === 4 && !q.service.selectedLevel) {
     return 'Acepta la recomendación EMC o escoge otro nivel de servicio antes de continuar.';
   }
