@@ -3366,7 +3366,7 @@ body {
 .screen,
 .app-shell {
   background:
-    linear-gradient(180deg, #e8f1fa 0%, #f4f7fa 240px, #eef3f8 100%);
+    linear-gradient(180deg, #cfdae7 0%, #dde6ef 240px, #d5e0ea 100%);
 }
 
 .card,
@@ -3378,7 +3378,7 @@ body {
 .material-summary > div {
   color: var(--gray-900);
   background:
-    linear-gradient(180deg, #ffffff 0%, #f7fafd 100%);
+    linear-gradient(180deg, #f8fbfe 0%, #edf3f8 100%);
 }
 
 .card h2,
