@@ -2197,7 +2197,7 @@ body {
   padding: 34px clamp(18px, 4vw, 64px);
   background:
     linear-gradient(90deg, rgba(7, 29, 54, 0.98) 0%, rgba(7, 29, 54, 0.9) 44%, rgba(7, 29, 54, 0.56) 74%, rgba(7, 29, 54, 0.34) 100%),
-    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) cover no-repeat,
+    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) auto no-repeat,
     #071d36;
   justify-content: flex-start;
 }
@@ -3165,7 +3165,7 @@ body {
 .home {
   background:
     linear-gradient(90deg, rgba(5, 20, 38, 0.98) 0%, rgba(7, 29, 54, 0.92) 42%, rgba(16, 65, 111, 0.62) 72%, rgba(63, 79, 99, 0.3) 100%),
-    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) cover no-repeat,
+    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) auto no-repeat,
     var(--blue-950);
 }
 
@@ -3332,7 +3332,7 @@ body {
   color: #fff;
   background:
     linear-gradient(90deg, rgba(5, 20, 38, 0.99) 0%, rgba(7, 29, 54, 0.96) 48%, rgba(11, 43, 76, 0.88) 72%, rgba(16, 65, 111, 0.62) 100%),
-    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) cover no-repeat,
+    url("/assets/emc-uniforme-interior.png") right center / min(52vw, 760px) auto no-repeat,
     var(--blue-950);
 }
 
@@ -3366,7 +3366,7 @@ body {
 .screen,
 .app-shell {
   background:
-    linear-gradient(180deg, #cfdae7 0%, #dde6ef 240px, #d5e0ea 100%);
+    linear-gradient(180deg, #06182d 0%, #092746 220px, #0d3458 100%);
 }
 
 .card,
