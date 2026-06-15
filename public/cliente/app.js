@@ -60,7 +60,7 @@ const stepLabels = [
   'Resumen'
 ];
 
-const requiredPhotos = ['Foto general', 'Foto de daños', 'Foto de acceso', 'Foto de detalle'];
+const requiredPhotos = ['Foto general', 'Foto de pared', 'Foto de acceso', 'Foto de detalle'];
 
 const levelOrder = ['basico', 'medio', 'premium'];
 const referenceMaterial = {
@@ -245,7 +245,7 @@ function emcAssistant() {
   if (!q.client.name || !q.client.phone) missing.push('Faltan datos básicos de contacto.');
   if (!m2) missing.push('Falta confirmar metros cuadrados aproximados.');
   if (!height) missing.push('Falta altura aproximada en metros.');
-  if (q.photos.length < 4) missing.push('Faltan fotos mínimas del proyecto.');
+  if (q.photos.length < 1) missing.push('Sin fotos; EMC puede pedir apoyo por WhatsApp si hace falta.');
   if (q.project.applicationType !== 'Interior' && height >= 4) questions.push('El trabajo parece alto. ¿Hay espacio y permiso para trabajar con acceso especial?');
 
   if (state.photoAnalysis?.alerts?.length) alerts.push(...state.photoAnalysis.alerts);
@@ -446,25 +446,25 @@ function home() {
         <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
         <h1>EMC Servicios y Suministros</h1>
         <p class="division">División Pintura</p>
-        <p class="home-tagline">Cotiza tu servicio en minutos</p>
+        <p class="home-tagline">Cotiza fácil, nosotros te ayudamos</p>
         <div class="benefits">
-          <span>Rápido</span>
-          <span>Profesional</span>
-          <span>Con materiales de calidad</span>
+          <span>Solo datos básicos</span>
+          <span>Si no sabes, te orientamos</span>
+          <span>Confirmamos por WhatsApp</span>
         </div>
         ${homeProcess()}
         <div class="button-stack">
           <button class="btn btn-primary btn-hero" data-action="quote">
             <strong>Empezar cotización</strong>
-            <small>Recibe precio estimado con tus fotos</small>
+            <small>Puedes enviar pocos datos y EMC te ayuda</small>
           </button>
           <button class="btn btn-light" data-action="how">
             <strong>Ver cómo funciona</strong>
-            <small>Conoce los pasos antes de cotizar</small>
+            <small>Sin tecnicismos ni compromiso</small>
           </button>
           <button class="btn btn-secondary" data-action="work">
-            <strong>Soy pintor</strong>
-            <small>Quiero entrar a la Red EMC</small>
+            <strong>Busco ingreso por evento</strong>
+            <small>Inscribirme como colaborador EMC</small>
           </button>
         </div>
       </div>
@@ -474,10 +474,10 @@ function home() {
 
 function homeProcess() {
   const steps = [
-    ['Decidir', 'Captura datos y fotos del proyecto.'],
-    ['Entender', 'EMC revisa área, acceso y señales visibles.'],
-    ['Cotizar', 'El sistema recomienda nivel y calcula materiales.'],
-    ['Mejorar', 'El cliente comenta y EMC confirma alcance.']
+    ['Pedir ayuda', 'Dejas tus datos básicos.'],
+    ['Orientar', 'EMC revisa lo que puedas enviar.'],
+    ['Estimar', 'Recibes un precio preliminar.'],
+    ['Confirmar', 'EMC valida contigo por WhatsApp.']
   ];
   return `
     <div class="client-method" aria-label="Método EMC">
@@ -527,10 +527,10 @@ function clientPhaseIndex() {
 function clientControlPath() {
   const current = clientPhaseIndex();
   const phases = [
-    ['Decidir', 'Datos y medidas'],
-    ['Entender', 'Fotos y señales'],
-    ['Cotizar', 'Nivel y materiales'],
-    ['Confirmar', 'PDF y comentarios']
+    ['Inicio', 'Datos básicos'],
+    ['Apoyo', 'Fotos si puedes'],
+    ['Precio', 'Estimado inicial'],
+    ['Confirmar', 'EMC te contacta']
   ];
   return `
     <div class="client-path" aria-label="Proceso EMC">
@@ -577,7 +577,7 @@ function quoteStep() {
 }
 
 function stepContext(calc) {
-  const title = state.step === 0 ? 'Datos para evaluar' : state.step < 5 ? 'Evaluación en proceso' : 'Revisa antes de aceptar';
+  const title = state.step === 0 ? 'Datos básicos para contactarte' : state.step < 5 ? 'Cotización orientativa' : 'Revisa antes de enviar';
   return `
     <div class="step-context">
       <div>
@@ -615,14 +615,14 @@ function stepClient() {
   return `
     <div class="card">
       ${workVisual('/assets/emc-uniforme-interior.png', 'Servicio profesional EMC', 'Pintores con playera azul, logo amarillo y gorra trabajando con protección y control de calidad.')}
-      <h2>Datos del cliente</h2>
-      <p class="muted">Estos datos ayudan a EMC a contactarte y validar la zona del servicio antes de confirmar agenda.</p>
+      <h2>Datos básicos</h2>
+      <p class="muted">No necesitas saber de construcción. Con tu nombre y WhatsApp podemos orientarte; si falta algo, EMC te lo pregunta después.</p>
       <div class="form-grid">
         ${input('client.name', 'Nombre completo', 'text', 'required autocomplete="name"')}
         ${input('client.phone', 'Teléfono WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
         ${input('client.email', 'Correo opcional', 'email')}
-        ${input('client.address', 'Dirección', 'text', 'required')}
-        ${input('client.city', 'Ciudad', 'text', 'required')}
+        ${input('client.address', 'Dirección o zona aproximada', 'text')}
+        ${input('client.city', 'Ciudad o municipio', 'text')}
         ${select('client.propertyType', 'Tipo de inmueble', ['Casa', 'Oficina', 'Local', 'Bodega', 'Edificio', 'Otro'])}
       </div>
       ${navActions()}
@@ -637,29 +637,29 @@ function stepProject() {
     Interior: {
       src: '/assets/emc-uniforme-interior.png',
       title: 'Trabajo interior',
-      caption: 'Pintores EMC uniformados trabajando en interiores; captura los m² interiores para cotizar correctamente.'
+      caption: 'Si no sabes los metros exactos, escribe un aproximado. EMC lo confirma contigo antes de trabajar.'
     },
     Exterior: {
       src: '/assets/emc-uniforme-exterior.png',
       title: 'Trabajo exterior',
-      caption: 'Pintores EMC uniformados trabajando en exterior; captura los m² exteriores, altura y acceso.'
+      caption: 'Si no sabes altura o medidas exactas, escribe lo que recuerdes. EMC valida antes de agendar.'
     },
     'Interior y exterior': {
       src: '/assets/emc-uniforme-exterior.png',
       title: 'Trabajo interior y exterior',
-      caption: 'Separa m² interiores y exteriores para calcular alcance, acceso y cotización con mayor precisión.'
+      caption: 'Puedes poner medidas aproximadas. EMC ajusta contigo si hace falta.'
     }
   }[p.applicationType] || {
     src: '/assets/emc-uniforme-interior.png',
     title: 'Detalles del proyecto',
-    caption: 'Captura los metros y condiciones del servicio.'
+    caption: 'No tiene que quedar perfecto. EMC te ayuda a completar la información.'
   };
   return `
     <div class="card visual-card project-visual">
       ${workVisual(projectVisual.src, projectVisual.title, projectVisual.caption)}
       <div>
         <h2>Detalles del proyecto</h2>
-        <p class="muted">Captura los metros según el tipo de aplicación. Si es interior y exterior, separa los m² para que la recomendación y la cotización sean congruentes.</p>
+        <p class="muted">Pon medidas aproximadas. Esta es una orientación inicial; EMC confirmará datos contigo antes de cerrar precio y agenda.</p>
       </div>
       <div class="form-grid">
         ${select('project.applicationType', 'Tipo de aplicación', ['Interior', 'Exterior', 'Interior y exterior'])}
@@ -670,12 +670,12 @@ function stepProject() {
           ${input('project.exteriorSquareMeters', 'm² exteriores', 'number', 'min="0" inputmode="decimal"')}
         ` : ''}
         ${input('project.floors', 'Número de plantas', 'number', 'min="1" inputmode="numeric"')}
-        ${input('project.heightMeters', 'Altura aproximada en metros', 'number', 'min="1" step="0.1" inputmode="decimal"')}
+        ${input('project.heightMeters', 'Altura aproximada si la sabes', 'number', 'min="1" step="0.1" inputmode="decimal"')}
       </div>
       <div class="risk-rule">
         <span>Equipo de acceso</span>
         <strong>${access.pending ? 'Pendiente de revisión' : access.scaffold ? 'Requiere revisión de acceso especial' : access.ladder ? 'Acceso con escalera o extensión' : 'Acceso normal'}</strong>
-        <small>EMC confirmará el acceso antes de agendar. Si se requiere andamio, se cotizará como costo adicional trasladable al cliente.</small>
+        <small>No te preocupes si no sabes esto. EMC lo confirma contigo antes de agendar.</small>
       </div>
       ${navActions()}
     </div>
@@ -686,9 +686,9 @@ function stepPhotos() {
   const aiConfigured = Boolean(state.aiStatus?.configured);
   return `
     <div class="card">
-      ${workVisual('/assets/emc-uniforme-diagnostico.png', 'Fotos para revisión EMC', 'Las fotos ayudan a validar daño, acceso y alcance antes de confirmar el servicio.')}
-      <h2>Fotos del proyecto</h2>
-      <p class="muted">Sube mínimo 4 fotos y máximo 10. Las fotos se usan para revisión preliminar durante la captura; por privacidad no se guardan en la cotización pública.</p>
+      ${workVisual('/assets/emc-uniforme-diagnostico.png', 'Fotos opcionales', 'Si puedes enviar fotos, ayudan mucho. Si no puedes, EMC te orienta por WhatsApp.')}
+      <h2>Fotos si puedes</h2>
+      <p class="muted">No son obligatorias para pedir ayuda. Si puedes, sube hasta 10 fotos; si no sabes cómo, continúa y EMC te contacta.</p>
       <div class="photo-checklist">
         ${requiredPhotos.map((label, index) => `<span class="${state.quote.photos[index] ? 'done' : ''}">${state.quote.photos[index] ? '✓' : index + 1} ${label}</span>`).join('')}
       </div>
@@ -698,7 +698,7 @@ function stepPhotos() {
       <label style="margin-top:12px;">Fotos adicionales
         <input type="file" accept="image/*" multiple data-extra-photos>
       </label>
-      <p class="muted">${state.quote.photos.length}/10 fotos cargadas</p>
+      <p class="muted">${state.quote.photos.length}/10 fotos cargadas · puedes continuar aunque no tengas fotos</p>
       ${photoAnalysisPanel()}
       ${navActions()}
     </div>
@@ -709,7 +709,7 @@ function photoAnalysisPanel() {
   if (!state.aiStatus?.configured && !state.photoAnalysis) {
     return `
       <div class="notice" style="margin-top:12px;">
-        Las fotos serán revisadas por EMC antes de confirmar el nivel de servicio. Con fotos cargadas, Básico no se confirma automáticamente.
+        Puedes continuar sin fotos. Si las envías, EMC las revisará antes de confirmar precio y alcance.
       </div>
     `;
   }
@@ -718,7 +718,7 @@ function photoAnalysisPanel() {
   }
   const analysis = state.photoAnalysis;
   if (!analysis) {
-    return '<div class="notice" style="margin-top:12px;">Cuando cargues las 4 fotos mínimas, el sistema las analizará automáticamente. EMC debe confirmar antes de ejecutar.</div>';
+    return '<div class="notice" style="margin-top:12px;">Las fotos son apoyo, no examen. Si no puedes subirlas, EMC te pedirá lo necesario por WhatsApp.</div>';
   }
   const visibleMinimum = customerMinimumLevel();
   const level = visibleMinimum && levels[visibleMinimum] ? levels[visibleMinimum].label : 'No definido';
@@ -767,7 +767,7 @@ function stepRecommendation(calc) {
       ${workVisual('/assets/emc-uniforme-interior.png', 'Recomendación por nivel de servicio', 'El sistema revisa fotos, área y acceso para recomendar el alcance correcto.')}
       <div class="success-mark small">✓</div>
       <h2>Recomendación del sistema EMC</h2>
-      <p class="muted">${minimumText} con los datos, condiciones y fotos capturadas para controlar alcance, riesgo y resultado.</p>
+      <p class="muted">${minimumText} con lo que nos compartiste. Es una orientación inicial; EMC confirma contigo antes de cerrar precio y agenda.</p>
       <div class="recommendation-box">
         <span>Servicio recomendado mínimo</span>
         <strong>${recommended.label} · ${recommendedRate}/m²</strong>
@@ -1026,13 +1026,13 @@ function crewInline(calc) {
         return `
           <button class="crew-card ${state.quote.service.painters === count ? 'selected' : ''}" data-pick-crew="${count}" type="button">
             <strong>${count}</strong>
-            <span>pintor${count > 1 ? 'es' : ''}</span>
+            <span>persona${count > 1 ? 's' : ''}</span>
             <small>${estimate.days} día(s)</small>
           </button>
         `;
       }).join('')}
     </div>
-    <div class="notice" style="margin-top:12px;">Con ${state.quote.service.painters} pintor(es), el avance de referencia es de ${Math.round(calc.dailyAdvance)} m² por jornada de 8 horas y el servicio tomaría aproximadamente ${calc.estimatedDays} día(s), según nivel elegido y condiciones capturadas.</div>
+    <div class="notice" style="margin-top:12px;">Con ${state.quote.service.painters} persona(s), el avance de referencia es de ${Math.round(calc.dailyAdvance)} m² por jornada de 8 horas y el servicio tomaría aproximadamente ${calc.estimatedDays} día(s), sujeto a revisión final EMC.</div>
   `;
 }
 
@@ -1079,12 +1079,12 @@ function stepSummary(calc) {
         <span>EMC revisará fotos, medidas, accesos y daños declarados antes de agendar.</span>
         <span>Si hay daño oculto, cambio de alcance o medidas diferentes, el precio puede ajustarse antes del inicio.</span>
       </div>
-      <div class="quote-validity">Vigencia: 15 días naturales. La cotización se basa en los datos, medidas, fotos y condiciones capturadas por el cliente.</div>
+      <div class="quote-validity">Vigencia: 15 días naturales. Es una cotización preliminar; EMC confirma contigo medidas, fotos si hacen falta y condiciones antes de iniciar.</div>
       <div class="quote-section feedback-section">
         <h3>Comentarios para mejorar</h3>
         <p class="muted">Tu opinión ayuda a EMC a mejorar esta página. Escribe qué te gustó, qué no te gustó o qué te gustaría ver antes de aceptar la cotización.</p>
-        <label>Comentarios del cliente
-          <textarea data-path="observations" placeholder="Ej. Me gustaría ver más opciones de pintura, explicar mejor el cálculo, agregar fotos de trabajos, cambiar algo del diseño...">${state.quote.observations || ''}</textarea>
+        <label>Comentarios o dudas
+          <textarea data-path="observations" placeholder="Ej. No sé los metros, quiero que me orienten por WhatsApp, no pude subir fotos, quiero visita o confirmación...">${state.quote.observations || ''}</textarea>
         </label>
       </div>
       <div class="actions quote-actions">
@@ -1115,24 +1115,24 @@ function clientQuoteProcess(calc) {
       <h3>Proceso EMC aplicado</h3>
       <div class="process-ledger">
         <div>
-          <span>1. Datos capturados</span>
+          <span>1. Datos básicos</span>
           <strong>${projectSquareMeters()} m² · ${q.project.applicationType}</strong>
-          <small>Medidas, altura, ciudad y tipo de inmueble.</small>
+          <small>Información inicial para orientar al cliente.</small>
         </div>
         <div>
-          <span>2. Revisión visual</span>
+          <span>2. Revisión EMC</span>
           <strong>${q.photos.length} foto${q.photos.length !== 1 ? 's' : ''}</strong>
-          <small>Las fotos orientan la recomendación antes de confirmar agenda.</small>
+          <small>Si faltan fotos o medidas, EMC las pide por WhatsApp.</small>
         </div>
         <div>
           <span>3. Servicio recomendado</span>
           <strong>${levels[calc.recommendedLevel].label}</strong>
-          <small>El cliente puede aceptar EMC o elegir otro nivel.</small>
+          <small>La persona recibe un estimado claro antes de decidir.</small>
         </div>
         <div>
-          <span>4. Cotización final</span>
+          <span>4. Cotización preliminar</span>
           <strong>${money(calc.total)}</strong>
-          <small>Servicio, pintura si aplica, IVA según selección y comentarios.</small>
+          <small>EMC confirma alcance y condiciones antes de iniciar.</small>
         </div>
       </div>
     </div>
@@ -1448,7 +1448,7 @@ function crewModal() {
       const estimate = estimateDays(level, count);
       return `
         <button class="select-card ${state.quote.service.painters === count ? 'selected' : ''}" data-pick-crew="${count}">
-          <strong>${count} pintor(es)</strong>
+          <strong>${count} persona(s)</strong>
           <span>${estimate.days} día(s) aproximados para ${state.quote.project.squareMeters} m²</span>
           <small>Avance de referencia: ${Math.round(estimate.dailyAdvance)} m² por día.</small>
         </button>
@@ -1485,35 +1485,35 @@ function serviceInfo() {
   return `
     <h2>Servicio de pintura</h2>
     <h3>Cómo funciona</h3>
-    <div class="summary-line"><span>1</span><strong>Decidir: capturas datos, medidas y fotos</strong></div>
-    <div class="summary-line"><span>2</span><strong>Entender: EMC interpreta área, acceso y señales visibles</strong></div>
-    <div class="summary-line"><span>3</span><strong>Cotizar: el sistema recomienda nivel, pintura y total</strong></div>
-    <div class="summary-line"><span>4</span><strong>Confirmar: revisas PDF, comentarios y condiciones</strong></div>
-    <div class="summary-line"><span>5</span><strong>Mejorar: EMC usa tus comentarios para ajustar el servicio</strong></div>
+    <div class="summary-line"><span>1</span><strong>Dejas nombre y WhatsApp</strong></div>
+    <div class="summary-line"><span>2</span><strong>Compartes medidas aproximadas si las sabes</strong></div>
+    <div class="summary-line"><span>3</span><strong>Subes fotos solo si puedes</strong></div>
+    <div class="summary-line"><span>4</span><strong>EMC te orienta y confirma por WhatsApp</strong></div>
+    <div class="summary-line"><span>5</span><strong>Antes de trabajar, se acuerda precio y alcance</strong></div>
     <h3>Alcances</h3>
-    <p class="muted">La cotización considera metros cuadrados, tipo de aplicación, fotos, nivel de servicio, pintura, altura, acceso y forma de pago.</p>
+    <p class="muted">La cotización inicia con datos sencillos. Si algo falta o no está claro, EMC lo revisa contigo antes de confirmar.</p>
     <h3>Compromisos EMC</h3>
-    <p class="muted">Revisar la información enviada, confirmar condiciones antes de iniciar y ejecutar el servicio conforme al nivel aceptado.</p>
-    <h3>Responsabilidades del cliente</h3>
-    <p class="muted">Capturar datos reales, enviar fotos claras y confirmar cualquier cambio de alcance antes del inicio.</p>
+    <p class="muted">Orientar al cliente, revisar lo enviado, pedir lo que falte y confirmar condiciones antes de iniciar.</p>
+    <h3>Lo que pedimos al cliente</h3>
+    <p class="muted">Compartir lo que sepa con honestidad. No tiene que ser experto ni mandar información perfecta.</p>
   `;
 }
 
 function collaboratorInfo() {
   return `
-    <h2>Red EMC</h2>
+    <h2>Colaboradores EMC</h2>
     <div class="senior-priority compact">
       <strong>50 años o más: tu experiencia tiene prioridad</strong>
-      <span>EMC valora a personas con oficio, cumplimiento y trayectoria. Cuando exista un proyecto compatible, revisaremos primero perfiles con experiencia comprobable.</span>
+      <span>EMC valora a personas con oficio, cumplimiento y trayectoria. Cuando exista una oportunidad compatible, revisaremos primero perfiles con experiencia comprobable.</span>
     </div>
     <div class="notice strong-notice">Al inscribirte, EMC te pedirá tu edad para aplicar la revisión preferente 50+.</div>
     <h3>Cómo funciona</h3>
     <div class="summary-line"><span>1</span><strong>Registras datos, edad, experiencia y zona</strong></div>
-    <div class="summary-line"><span>2</span><strong>EMC revisa perfiles para servicios eventuales</strong></div>
+    <div class="summary-line"><span>2</span><strong>EMC revisa perfiles para oportunidades por evento</strong></div>
     <div class="summary-line"><span>3</span><strong>Quien cumple y entrega calidad aumenta su prioridad</strong></div>
-    <div class="notice">No es empleo fijo ni nómina. Es una red para oportunidades reales cuando exista trabajo compatible.</div>
+    <div class="notice">No es empleo fijo ni nómina. Es una inscripción para posibles ingresos temporales o por evento cuando exista trabajo compatible.</div>
     <div class="actions single">
-      <button class="btn btn-primary" data-action="work" type="button">Inscribirme en la Red EMC</button>
+      <button class="btn btn-primary" data-action="work" type="button">Inscribirme como colaborador</button>
     </div>
   `;
 }
@@ -1528,12 +1528,12 @@ function workForm() {
       </div>
       <div class="card network-hero">
         <img class="network-hero-photo" src="/assets/emc-red-apoyo-pintor.png" alt="Persona recibiendo apoyo de la Red EMC">
-        <span class="eyebrow">Red EMC</span>
+        <span class="eyebrow">Colaboradores EMC</span>
         <h2>Cuando hay trabajo, llamamos primero a nuestra gente</h2>
-        <p class="muted">Regístrate para oportunidades eventuales en servicios generales. Pintura será una de las primeras áreas de referencia EMC.</p>
+        <p class="muted">Regístrate si buscas ingresos temporales o por evento en servicios generales. Pintura será una de las primeras áreas de referencia EMC.</p>
         <div class="senior-priority hero-priority">
           <strong>¿Tienes 50 años o más?</strong>
-          <span>Tu experiencia tiene trato preferente en la revisión de colaboradores EMC.</span>
+          <span>Tu experiencia tendrá revisión preferente para oportunidades compatibles.</span>
         </div>
         <div class="network-pill-grid">
           <span>Experiencia</span>
@@ -1542,21 +1542,21 @@ function workForm() {
         </div>
       </div>
       <div class="card">
-        <h2>Registro Red EMC</h2>
+        <h2>Registro de colaboradores</h2>
         <div class="senior-priority form-priority">
           <strong>Personas de 50 años o más tendrán revisión preferente</strong>
-          <span>EMC busca oficio, seriedad y experiencia. No prometemos empleo fijo; sí damos prioridad de consideración cuando exista un servicio compatible.</span>
+          <span>EMC busca oficio, seriedad y experiencia. No prometemos empleo fijo; consideramos perfiles cuando exista un servicio compatible.</span>
         </div>
         <div class="form-grid">
           <div class="notice strong-notice">Área: Servicios generales · Referencia inicial: pintura</div>
-          <div class="notice" id="collab-rate">Pago mínimo inicial: desde ${money(baseRate)} por m². Sujeto a evaluación por experiencia, calidad, puntualidad y tipo de servicio.</div>
-          <label class="check-row"><input id="collab-accept" type="checkbox"> Entiendo que es registro para oportunidades eventuales dentro de la Red EMC</label>
+          <div class="notice" id="collab-rate">Ingreso por evento: referencia inicial desde ${money(baseRate)} por m² en pintura. Puede variar por experiencia, calidad, puntualidad y tipo de servicio.</div>
+          <label class="check-row"><input id="collab-accept" type="checkbox"> Entiendo que es registro para posibles ingresos temporales o por evento, no empleo fijo</label>
           <label>Nombre<input id="collab-name"></label>
           <label>Teléfono<input id="collab-phone" type="tel"></label>
           <label>Edad<input id="collab-age" type="number" min="18" max="90" step="1" inputmode="numeric"></label>
           <label>Ciudad<input id="collab-city"></label>
           <label>Zona o colonia donde sales normalmente<input id="collab-zone" placeholder="Ej. Centro, Atasta, Tamulté, Gaviotas"></label>
-          <label>¿Cuántos años tienes de experiencia en servicios generales?
+          <label>¿Cuántos años tienes de experiencia en oficio o servicios generales?
             <input id="collab-experience-years" type="number" min="0" max="60" step="1" inputmode="numeric">
           </label>
           <label>Disponibilidad<input id="collab-availability" placeholder="Ej. fines de semana, entre semana, inmediato"></label>
@@ -1564,7 +1564,7 @@ function workForm() {
         </div>
         <div class="notice" style="margin-top:12px;">Tu prioridad aumenta con experiencia comprobable, puntualidad, trabajo limpio y calidad.</div>
         <div class="actions single">
-          <button class="btn btn-primary" data-action="send-collab">Enviar registro a la Red EMC</button>
+          <button class="btn btn-primary" data-action="send-collab">Enviar registro como colaborador</button>
         </div>
         <div class="actions single">
           <button class="btn btn-ghost" data-action="home" type="button">Atrás</button>
@@ -1583,7 +1583,7 @@ function success() {
         <div class="success-mark">✓</div>
         <h2>Recibimos tu cotización</h2>
         <p>Folio: <strong>${quote.folio}</strong></p>
-        <p class="muted">Estatus inicial: Nueva cotización. EMC revisará tus datos, fotos y condiciones capturadas.</p>
+        <p class="muted">Estatus inicial: Nueva cotización. EMC revisará tus datos y te pedirá por WhatsApp lo que falte.</p>
         <div class="success-summary">
           <span>Total preliminar</span>
           <strong>${money(quote.calculation?.total)}</strong>
@@ -1650,18 +1650,14 @@ function validationMessage() {
   if (state.step === 0) {
     if (!q.client.name.trim()) return 'Captura el nombre del cliente.';
     if (q.client.phone.replace(/\D/g, '').length < 10) return 'Captura un teléfono WhatsApp válido de al menos 10 dígitos.';
-    if (!q.client.address.trim()) return 'Captura la dirección del servicio.';
-    if (!q.client.city.trim()) return 'Captura la ciudad.';
   }
   if (state.step === 1) {
-    if (projectSquareMeters() <= 0) return 'Captura los metros cuadrados aproximados.';
+    if (projectSquareMeters() <= 0) return 'Captura metros aproximados. Si no sabes, escribe un estimado y EMC lo confirma por WhatsApp.';
     if (q.project.applicationType === 'Interior y exterior' && (!Number(q.project.interiorSquareMeters || 0) || !Number(q.project.exteriorSquareMeters || 0))) {
-      return 'Para interior y exterior, captura por separado los m² interiores y exteriores.';
+      return 'Si es interior y exterior, pon un aproximado de cada parte. EMC lo puede ajustar contigo después.';
     }
-    if (Number(q.project.heightMeters) <= 0) return 'Captura la altura aproximada.';
     if (Number(q.project.heightMeters) > 15) return 'Revisa la altura: parece demasiado alta para una cotización rápida.';
   }
-  if (state.step === 2 && state.quote.photos.length < 4) return 'Sube las 4 fotos mínimas para que EMC pueda revisar el alcance.';
   if (state.step === 2 && photoReviewPending()) return 'Espera unos segundos: el sistema está terminando la revisión de fotos antes de recomendar un nivel.';
   if (state.step === 4 && !q.service.selectedLevel) {
     return 'Acepta la recomendación EMC o escoge otro nivel de servicio antes de continuar.';
@@ -1965,7 +1961,7 @@ async function analyzePhotos(options = {}) {
     if (!options.silent) alert('EMC revisará fotos manualmente antes de confirmar Básico.');
     return;
   }
-  if (state.quote.photos.length < 4) return alert('Sube las 4 fotos mínimas para analizar.');
+  if (state.quote.photos.length < 1) return alert('Si quieres análisis automático, sube al menos una foto. También puedes continuar sin fotos y EMC te orienta por WhatsApp.');
   state.analyzingPhotos = true;
   if (!options.silent) render();
   try {
@@ -2012,14 +2008,14 @@ async function analyzePhotos(options = {}) {
 }
 
 async function acceptQuote() {
-  if (!validateStep()) return alert('Faltan datos o fotos requeridas.');
+  if (!validateStep()) return alert('Faltan algunos datos básicos. Si no sabes una medida, escribe un aproximado y EMC lo confirma por WhatsApp.');
   const calc = calculate();
   const photoReview = {
     count: state.quote.photos.length,
     requiredCount: requiredPhotos.length,
     requiredLabels: requiredPhotos,
     receivedLabels: state.quote.photos.map(photo => photo.label),
-    storage: 'Las fotos se usaron solo para captura y revisión preliminar; no se guardan en la cotización pública.',
+    storage: 'Las fotos, si se enviaron, se usaron solo como apoyo preliminar; no se guardan en la cotización pública.',
     aiAnalysis: state.photoAnalysis ? {
       enabled: Boolean(state.photoAnalysis.enabled),
       status: state.photoAnalysis.status || '',
@@ -2040,8 +2036,8 @@ async function acceptQuote() {
     calculation: calc,
     assistant: calc.assistant,
     legal: {
-      quote: 'Los precios pueden variar debido a cambios en el mercado mexicano de pinturas, materiales y consumibles. Esta cotización tiene vigencia de 15 días naturales.',
-      technical: 'La cotización se genera con base en los datos, medidas, revisión preliminar de fotos y condiciones capturadas por el cliente. Por privacidad, las fotos no se almacenan en la cotización pública. Cambios de alcance, daños ocultos o condiciones no declaradas podrán generar ajustes antes del inicio del servicio.'
+      quote: 'Los precios pueden variar debido a cambios en el mercado mexicano de pinturas, materiales y consumibles. Esta cotización preliminar tiene vigencia de 15 días naturales.',
+      technical: 'La cotización se genera con la información disponible. EMC confirmará medidas, condiciones y alcance por WhatsApp antes de iniciar. Si aparecen daños ocultos o cambios de alcance, se explicarán antes de ajustar el servicio.'
     }
   };
   const response = await fetch('/api/quotes', {
@@ -2084,14 +2080,14 @@ async function sendCollaborator() {
     photos
   };
   if (!payload.acceptedByService || !payload.name || !payload.phone) {
-    return alert('Acepta el registro a la Red EMC y captura nombre y teléfono.');
+    return alert('Acepta el registro como colaborador y captura nombre y teléfono.');
   }
   await fetch('/api/collaborators', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  alert('Registro enviado a la Red EMC.');
+  alert('Registro enviado. EMC revisará si hay una oportunidad compatible por evento.');
   setView('home', 0);
 }
 
