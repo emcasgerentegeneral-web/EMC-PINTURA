@@ -687,18 +687,37 @@ function stepPhotos() {
   return `
     <div class="card">
       ${workVisual('/assets/emc-uniforme-diagnostico.png', 'Fotos opcionales', 'Si puedes enviar fotos, ayudan mucho. Si no puedes, EMC te orienta por WhatsApp.')}
-      <h2>Fotos si puedes</h2>
-      <p class="muted">No son obligatorias para pedir ayuda. Si puedes, sube hasta 10 fotos; si no sabes cómo, continúa y EMC te contacta.</p>
-      <div class="photo-checklist">
-        ${requiredPhotos.map((label, index) => `<span class="${state.quote.photos[index] ? 'done' : ''}">${state.quote.photos[index] ? '✓' : index + 1} ${label}</span>`).join('')}
+      <h2>Fotos o asesoría directa</h2>
+      <p class="muted">Elige la forma más fácil para ti. Puedes subir fotos ahora o pedir que EMC te oriente directo por WhatsApp.</p>
+      <div class="photo-help-choice">
+        <div>
+          <strong>Subir fotos ahora</strong>
+          <span>Ayuda a estimar mejor el trabajo. No tiene que quedar perfecto.</span>
+        </div>
+        <div>
+          <strong>Quiero asesoría directa</strong>
+          <span>Continúa sin fotos y EMC te contacta para pedirte lo necesario.</span>
+        </div>
       </div>
-      <div class="photo-grid">
-        ${requiredPhotos.map((label, index) => photoInput(label, index)).join('')}
+      <div class="photo-upload-panel">
+        <div class="photo-upload-header">
+          <div>
+            <span>Si puedes, sube estas fotos</span>
+            <strong>${state.quote.photos.length}/10 fotos cargadas</strong>
+          </div>
+          <small>Puedes continuar sin subirlas.</small>
+        </div>
+        <div class="photo-guide-grid">
+          ${requiredPhotos.map((label, index) => photoInput(label, index)).join('')}
+        </div>
+        <label class="photo-extra-upload">Agregar más fotos si las tienes
+          <input type="file" accept="image/*" multiple data-extra-photos>
+        </label>
       </div>
-      <label style="margin-top:12px;">Fotos adicionales
-        <input type="file" accept="image/*" multiple data-extra-photos>
-      </label>
-      <p class="muted">${state.quote.photos.length}/10 fotos cargadas · puedes continuar aunque no tengas fotos</p>
+      <div class="direct-advice-note">
+        <strong>¿No sabes qué foto tomar?</strong>
+        <span>No pasa nada. Presiona continuar y EMC te orienta por WhatsApp.</span>
+      </div>
       ${photoAnalysisPanel()}
       ${navActions()}
     </div>
@@ -749,8 +768,12 @@ function photoAnalysisPanel() {
 function photoInput(label, index) {
   const photo = state.quote.photos[index];
   return `
-    <div class="photo-tile">
-      <label>${label}<input type="file" accept="image/*" data-photo-index="${index}"></label>
+    <div class="photo-tile ${photo ? 'has-photo' : ''}">
+      <label>
+        <strong>${label}</strong>
+        <span>${photo ? 'Foto cargada' : 'Tocar para elegir foto'}</span>
+        <input type="file" accept="image/*" data-photo-index="${index}">
+      </label>
       ${photo ? `<img src="${photo.dataUrl}" alt="${label}">` : ''}
     </div>
   `;
@@ -886,14 +909,14 @@ function stepSupply(calc) {
       </div>
       <div class="supply-grid">
         <button class="supply-card ${q.service.paintSupply === 'emc' ? 'selected' : ''}" data-paint-supply="emc" type="button">
-          <strong>Deseo que EMC cotice pintura</strong>
-          <span>Seleccionar pintura y sellador.</span>
-          <small class="supply-help">EMC calcula y cotiza pintura/sellador según área, nivel de servicio y rendimiento del material seleccionado.</small>
+          <strong>Quiero que EMC incluya la pintura</strong>
+          <span>EMC calcula pintura, sellador si hace falta y materiales.</span>
+          <small class="supply-help">Recomendado si quieres que EMC te ayude a elegir y cotizar el material correcto.</small>
         </button>
         <button class="supply-card ${q.service.paintSupply === 'cliente' ? 'selected' : ''}" data-client-supply-continue type="button">
-          <strong>El cliente proporcionará la pintura</strong>
-          <span>Continuar sin agregar pintura.</span>
-          <small class="supply-help">EMC no se hace responsable por calidad, tono, rendimiento, cobertura o garantía de pintura/sellador comprado por el cliente.</small>
+          <strong>Yo ya tengo la pintura</strong>
+          <span>EMC solo cotiza la mano de obra y revisa si falta algo.</span>
+          <small class="supply-help">Si la pintura no alcanza o no cubre bien, EMC te avisará antes de continuar.</small>
         </button>
       </div>
       ${q.service.paintSupply === 'emc' ? `
