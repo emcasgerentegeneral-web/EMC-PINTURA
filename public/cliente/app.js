@@ -180,8 +180,8 @@ function update(path, value) {
 
 async function loadConfig() {
   const [configResponse, aiStatusResponse] = await Promise.all([
-    fetch('/api/config'),
-    fetch('/api/ai-status')
+    fetch('/api/config', { cache: 'no-store' }),
+    fetch('/api/ai-status', { cache: 'no-store' })
   ]);
   state.config = await configResponse.json();
   state.aiStatus = await aiStatusResponse.json();
