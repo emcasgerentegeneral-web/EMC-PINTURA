@@ -178,11 +178,11 @@ function collaboratorRow(record) {
 async function listQuotes() {
   if (!USE_SUPABASE) return readJson(QUOTES_FILE);
   const rows = await supabaseRequest('emc_quotes', {
-    query: `?folio=neq.${CONFIG_RECORD_FOLIO}&select=payload&order=created_at.desc`
+    query: `?folio=not.in.(${CONFIG_RECORD_FOLIO},${ANALYTICS_RECORD_FOLIO})&select=payload&order=created_at.desc`
   });
   return rows
     .map(row => row.payload)
-    .filter(item => item?.folio !== ANALYTICS_RECORD_FOLIO);
+    .filter(item => item?.folio);
 }
 
 async function createQuoteRecord(quote) {
