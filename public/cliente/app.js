@@ -201,6 +201,10 @@ async function loadConfig() {
   ]);
   state.config = await configResponse.json();
   state.aiStatus = await aiStatusResponse.json();
+  if (new URLSearchParams(window.location.search).get('start') === 'quote') {
+    startNewQuote();
+    return;
+  }
   render();
 }
 
@@ -475,14 +479,6 @@ function home() {
             <small>Gratis y sin compromiso</small>
           </button>
           ${whatsappUrl() ? `<a class="btn btn-light" href="${whatsappUrl()}" target="_blank" rel="noopener"><strong>Enviar WhatsApp</strong><small>Hablar con EMC Pintura</small></a>` : ''}
-          <button class="btn btn-light" data-action="how">
-            <strong>Ver cómo funciona</strong>
-            <small>Sin tecnicismos ni compromiso</small>
-          </button>
-          <button class="btn btn-secondary" data-action="work">
-            <strong>Busco ingreso por evento</strong>
-            <small>Inscribirme como colaborador EMC</small>
-          </button>
         </div>
       </div>
     </section>

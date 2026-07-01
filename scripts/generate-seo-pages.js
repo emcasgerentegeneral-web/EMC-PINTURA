@@ -87,8 +87,8 @@ function pageHtml({ location, service, intent, fileSlug }) {
       <h1>${titleCase(service)} en ${location}: calcula tu precio aproximado</h1>
       <p class="lead">EMC Pintura te ayuda a estimar cuanto cuesta ${intent} con mano de obra, preparacion, materiales opcionales y seguimiento profesional.</p>
       <div class="cta-row">
-        <a class="button" href="/cliente/">Calcular ahora</a>
-        <a class="button secondary" href="/cliente/">Pedir cotizacion profesional</a>
+        <a class="button" href="/cliente/?start=quote">Calcular ahora</a>
+        <a class="button secondary" href="/cliente/?start=quote">Pedir cotizacion profesional</a>
       </div>
     </header>
     <main>
@@ -117,7 +117,7 @@ function pageHtml({ location, service, intent, fileSlug }) {
       <section>
         <h2>Calcula gratis en menos de 60 segundos</h2>
         <p>Si estas comparando precios para ${service} en ${location}, empieza con un estimado claro. Despues EMC valida fotos, medidas y agenda para convertirlo en cotizacion profesional.</p>
-        <a class="button" href="/cliente/">Calcular precio con EMC Pintura</a>
+        <a class="button" href="/cliente/?start=quote">Calcular precio con EMC Pintura</a>
       </section>
     </main>
     <footer>EMC Pintura · Servicios de pintura e impermeabilizacion en Tabasco</footer>
