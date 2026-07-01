@@ -141,6 +141,22 @@ function today() {
   return new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: '2-digit' });
 }
 
+function businessWhatsapp() {
+  return String(state.config?.contact?.whatsapp || '').replace(/\D/g, '');
+}
+
+function whatsappUrl(text = 'Hola, quiero una cotización para pintar mi casa con EMC Pintura.') {
+  const phone = businessWhatsapp();
+  const message = encodeURIComponent(text);
+  return phone ? `https://wa.me/${phone}?text=${message}` : '';
+}
+
+function whatsappCta(className = 'floating-whatsapp') {
+  const url = whatsappUrl();
+  if (!url) return '';
+  return `<a class="${className}" href="${url}" target="_blank" rel="noopener">WhatsApp</a>`;
+}
+
 function scrollToPageStart() {
   window.scrollTo(0, 0);
   document.documentElement.scrollTop = 0;
@@ -444,20 +460,21 @@ function home() {
     <section class="home">
       <div class="home-card">
         <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
-        <h1>EMC Servicios y Suministros</h1>
-        <p class="division">División Pintura</p>
-        <p class="home-tagline">Cotiza fácil, nosotros te ayudamos</p>
+        <p class="division">EMC Pintura en Villahermosa y Tabasco</p>
+        <h1>Calcula gratis cuanto cuesta pintar tu casa en menos de 60 segundos.</h1>
+        <p class="home-tagline">Recibe un precio preliminar con mano de obra, materiales y alcance claro antes de agendar.</p>
         <div class="benefits">
-          <span>Solo datos básicos</span>
-          <span>Si no sabes, te orientamos</span>
-          <span>Confirmamos por WhatsApp</span>
+          <span>Precio aproximado al instante</span>
+          <span>Cotización profesional en PDF</span>
+          <span>Seguimiento por WhatsApp</span>
         </div>
         ${homeProcess()}
         <div class="button-stack">
           <button class="btn btn-primary btn-hero" data-action="quote">
-            <strong>Empezar cotización</strong>
-            <small>Puedes enviar pocos datos y EMC te ayuda</small>
+            <strong>Calcular ahora</strong>
+            <small>Gratis y sin compromiso</small>
           </button>
+          ${whatsappUrl() ? `<a class="btn btn-light" href="${whatsappUrl()}" target="_blank" rel="noopener"><strong>Enviar WhatsApp</strong><small>Hablar con EMC Pintura</small></a>` : ''}
           <button class="btn btn-light" data-action="how">
             <strong>Ver cómo funciona</strong>
             <small>Sin tecnicismos ni compromiso</small>
@@ -469,24 +486,32 @@ function home() {
         </div>
       </div>
     </section>
+    <section class="seo-strip" aria-label="Servicios de pintura">
+      <div>
+        <strong>Servicios de pintura para casas, fachadas, oficinas, bardas y locales</strong>
+        <span>Atención en Villahermosa, Centro, Cárdenas, Comalcalco, Paraíso, Nacajuca y más zonas de Tabasco.</span>
+      </div>
+      <button class="btn btn-dark" data-action="quote" type="button">Calcular precio</button>
+    </section>
+    ${whatsappCta()}
   `;
 }
 
 function homeProcess() {
   const steps = [
-    ['Pedir ayuda', 'Dejas tus datos básicos.'],
-    ['Orientar', 'EMC revisa lo que puedas enviar.'],
-    ['Estimar', 'Recibes un precio preliminar.'],
-    ['Confirmar', 'EMC valida contigo por WhatsApp.']
+    ['1', 'Indica metros, ciudad y tipo de pintura.'],
+    ['2', 'Sube fotos para revisar alcance y acceso.'],
+    ['3', 'Obtén precio aproximado y materiales.'],
+    ['4', 'Envía solicitud y recibe seguimiento.']
   ];
   return `
     <div class="client-method" aria-label="Método EMC">
-      <span>Método EMC</span>
+      <span>Cómo obtienes tu precio</span>
       <div class="client-method-grid">
         ${steps.map(([title, text], index) => `
           <div class="client-method-card">
-            <small>${index + 1}</small>
-            <strong>${title}</strong>
+            <small>${title}</small>
+            <strong>${index === 0 ? 'Datos' : index === 1 ? 'Fotos' : index === 2 ? 'Precio' : 'Contacto'}</strong>
             <em>${text}</em>
           </div>
         `).join('')}
@@ -573,6 +598,7 @@ function quoteStep() {
       ${steps[state.step](calc)}
     </section>
     ${modal()}
+    ${whatsappCta()}
   `;
 }
 
@@ -615,8 +641,8 @@ function stepClient() {
   return `
     <div class="card">
       ${workVisual('/assets/emc-uniforme-interior.png', 'Servicio profesional EMC', 'Pintores con playera azul, logo amarillo y gorra trabajando con protección y control de calidad.')}
-      <h2>Datos básicos</h2>
-      <p class="muted">No necesitas saber de construcción. Con tu nombre y WhatsApp podemos orientarte; si falta algo, EMC te lo pregunta después.</p>
+      <h2>Recibe tu precio aproximado</h2>
+      <p class="muted">Primero calculamos una estimación útil. Después EMC te contacta por WhatsApp para validar fotos, medidas y agenda.</p>
       <div class="form-grid">
         ${input('client.name', 'Nombre completo', 'text', 'required autocomplete="name"')}
         ${input('client.phone', 'Teléfono WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
@@ -1096,6 +1122,7 @@ function stepSummary(calc) {
   return `
     <div class="quote-document">
       ${summary(calc)}
+      ${leadCaptureBox(calc)}
       ${clientQuoteProcess(calc)}
       <div class="client-check">
         <strong>Condiciones antes de agendar</strong>
@@ -1112,9 +1139,15 @@ function stepSummary(calc) {
       </div>
       <div class="actions quote-actions">
         <button class="btn btn-primary btn-hero" data-action="accept">
-          <strong>Aceptar y enviar solicitud</strong>
-          <small>EMC revisa y confirma agenda</small>
+          <strong>Quiero mi cotización profesional</strong>
+          <small>Enviar solicitud a EMC Pintura</small>
         </button>
+        ${whatsappUrl(`Hola, quiero una cotización profesional de EMC Pintura. Mi total preliminar es ${money(calc.total)}.`) ? `
+          <a class="btn btn-dark" href="${whatsappUrl(`Hola, quiero una cotización profesional de EMC Pintura. Mi total preliminar es ${money(calc.total)}.`)}" target="_blank" rel="noopener">
+            <strong>Enviar por WhatsApp</strong>
+            <small>Hablar ahora con EMC</small>
+          </a>
+        ` : ''}
         <button class="btn btn-ghost" data-action="print-pdf">
           <strong>Guardar PDF</strong>
           <small>Descargar o imprimir cotización</small>
@@ -1127,6 +1160,21 @@ function stepSummary(calc) {
       <div class="actions single">
         <button class="btn btn-ghost btn-soft-action" data-action="home">Salir sin enviar</button>
       </div>
+    </div>
+  `;
+}
+
+function leadCaptureBox(calc) {
+  return `
+    <div class="quote-section lead-box">
+      <span>Tu proyecto cuesta aproximadamente</span>
+      <strong>${money(calc.total)}</strong>
+      <div class="lead-includes">
+        <span>Incluye mano de obra</span>
+        <span>Incluye preparación según nivel</span>
+        <span>${state.quote.service.paintSupply === 'emc' ? 'Incluye materiales seleccionados' : 'Materiales a cargo del cliente'}</span>
+      </div>
+      <p>¿Quieres una cotización profesional en PDF y seguimiento por WhatsApp? Envia la solicitud y EMC revisa medidas, fotos y agenda.</p>
     </div>
   `;
 }
@@ -1201,7 +1249,7 @@ function summary(calc) {
       </div>
     </div>
     <div class="quote-total-hero">
-      <span>Total estimado</span>
+      <span>Tu proyecto cuesta aproximadamente</span>
       <strong>${money(calc.total)}</strong>
       <small>${q.service.invoice ? 'Incluye IVA 16%' : 'Sin factura'}</small>
     </div>
@@ -1599,19 +1647,21 @@ function workForm() {
 
 function success() {
   const quote = state.lastSavedQuote || {};
+  const whatsapp = whatsappUrl(`Hola, ya envié mi solicitud en EMC Pintura. Folio: ${quote.folio || ''}. Total preliminar: ${money(quote.calculation?.total)}.`);
   return `
     ${topbar('Cotización enviada')}
     <section class="screen">
       <div class="card success">
         <div class="success-mark">✓</div>
-        <h2>Recibimos tu cotización</h2>
+        <h2>Recibimos tu solicitud</h2>
         <p>Folio: <strong>${quote.folio}</strong></p>
-        <p class="muted">Estatus inicial: Nueva cotización. EMC revisará tus datos y te pedirá por WhatsApp lo que falte.</p>
+        <p class="muted">EMC Pintura revisará tus datos, fotos y condiciones capturadas para confirmar alcance y agenda.</p>
         <div class="success-summary">
           <span>Total preliminar</span>
           <strong>${money(quote.calculation?.total)}</strong>
           <small>${quote.client?.name || ''} · ${quote.project?.squareMeters || '-'} m² · ${quote.project?.applicationType || '-'}</small>
         </div>
+        ${whatsapp ? `<a class="btn btn-dark" href="${whatsapp}" target="_blank" rel="noopener">Continuar por WhatsApp</a>` : ''}
         <button class="btn btn-ghost" data-action="copy-summary">Copiar resumen</button>
         <button class="btn btn-primary" data-action="home">Volver al inicio</button>
       </div>

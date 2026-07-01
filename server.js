@@ -30,6 +30,7 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const ALERT_EMAIL_FROM = process.env.ALERT_EMAIL_FROM || '';
 const ALERT_EMAIL_TO = process.env.ALERT_EMAIL_TO || ADMIN_USER;
 const PUBLIC_BASE_URL = (process.env.PUBLIC_BASE_URL || '').replace(/\/+$/, '');
+const PUBLIC_WHATSAPP_NUMBER = String(process.env.PUBLIC_WHATSAPP_NUMBER || '').replace(/\D/g, '');
 const PUBLIC_CLIENT_ONLY = String(process.env.PUBLIC_CLIENT_ONLY || '').toLowerCase() === 'true';
 const ADMIN_PANEL_URL = (process.env.ADMIN_PANEL_URL || '').replace(/\/+$/, '');
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
@@ -96,19 +97,26 @@ async function supabaseRequest(table, { method = 'GET', query = '', body = null,
 
 async function loadConfigRecord() {
   const localConfig = readJson(CONFIG_FILE);
-  if (!USE_SUPABASE) return localConfig;
+  const withPublicContact = config => ({
+    ...config,
+    contact: {
+      ...(config.contact || {}),
+      whatsapp: PUBLIC_WHATSAPP_NUMBER || config.contact?.whatsapp || ''
+    }
+  });
+  if (!USE_SUPABASE) return withPublicContact(localConfig);
 
   try {
     const rows = await supabaseRequest('emc_quotes', {
       query: `?folio=eq.${CONFIG_RECORD_FOLIO}&select=payload&limit=1`
     });
-    if (rows?.[0]?.payload) return rows[0].payload;
+    if (rows?.[0]?.payload) return withPublicContact(rows[0].payload);
 
     await saveConfigRecord(localConfig);
-    return localConfig;
+    return withPublicContact(localConfig);
   } catch (error) {
     console.warn(`No se pudo leer la configuración compartida; se usará configuración local: ${error.message}`);
-    return localConfig;
+    return withPublicContact(localConfig);
   }
 }
 

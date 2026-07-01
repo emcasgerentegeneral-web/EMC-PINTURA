@@ -3578,3 +3578,125 @@ body {
   outline: 4px solid rgba(255, 216, 74, 0.42);
   outline-offset: 3px;
 }
+
+/* Lead generation and local SEO layer */
+a.btn {
+  text-decoration: none;
+}
+
+.seo-strip {
+  width: 100%;
+  padding: 18px clamp(18px, 4vw, 64px);
+  background: #ffffff;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.seo-strip > div {
+  width: min(100%, 860px);
+  display: grid;
+  gap: 4px;
+}
+
+.seo-strip strong {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.12;
+}
+
+.seo-strip span {
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20;
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #177245;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 950;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
+}
+
+.floating-whatsapp:hover {
+  transform: translateY(-1px);
+}
+
+.lead-box {
+  border-color: rgba(23, 114, 69, 0.28) !important;
+  background:
+    linear-gradient(180deg, #f4fbf7 0%, #ffffff 100%) !important;
+  display: grid;
+  gap: 12px;
+}
+
+.lead-box > span {
+  color: #177245;
+  font-size: 13px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.lead-box > strong {
+  color: var(--navy);
+  font-size: clamp(34px, 5vw, 60px);
+  line-height: 0.98;
+}
+
+.lead-box p {
+  margin: 0;
+  color: #43536a;
+  font-weight: 800;
+  line-height: 1.42;
+}
+
+.lead-includes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lead-includes span {
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid rgba(23, 114, 69, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy);
+  font-weight: 900;
+}
+
+@media (max-width: 760px) {
+  .seo-strip {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .seo-strip .btn {
+    width: 100%;
+  }
+
+  .floating-whatsapp {
+    right: 12px;
+    bottom: 12px;
+    min-height: 48px;
+    padding: 0 15px;
+  }
+
+  .lead-includes {
+    grid-template-columns: 1fr;
+  }
+}
