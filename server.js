@@ -60,7 +60,8 @@ const mimeTypes = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
-  '.svg': 'image/svg+xml'
+  '.svg': 'image/svg+xml',
+  '.xml': 'application/xml; charset=utf-8'
 };
 
 function ensureDataFiles() {
