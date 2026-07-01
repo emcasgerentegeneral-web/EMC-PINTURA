@@ -52,12 +52,12 @@ const state = {
 };
 
 const stepLabels = [
-  'Contacto',
-  'Proyecto',
+  'Tus datos',
+  'Qué se pinta',
   'Fotos',
-  'Recomendación',
-  'Suministro',
-  'Resumen'
+  'Precio',
+  'Pintura',
+  'Enviar'
 ];
 
 const requiredPhotos = ['Foto general', 'Foto de pared', 'Foto de acceso', 'Foto de detalle'];
@@ -465,11 +465,11 @@ function home() {
       <div class="home-card">
         <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
         <p class="division">EMC Pintura en Villahermosa y Tabasco</p>
-        <h1>Calcula gratis cuanto cuesta pintar tu casa en menos de 60 segundos.</h1>
-        <p class="home-tagline">Recibe un precio preliminar con mano de obra, materiales y alcance claro antes de agendar.</p>
+        <h1>Dinos qué vas a pintar y te damos un precio aproximado.</h1>
+        <p class="home-tagline">No necesitas saber de pintura. Pon datos aproximados y EMC te confirma por WhatsApp.</p>
         <div class="benefits">
-          <span>Precio aproximado al instante</span>
-          <span>Cotización profesional en PDF</span>
+          <span>Gratis</span>
+          <span>Rápido</span>
           <span>Seguimiento por WhatsApp</span>
         </div>
         ${homeProcess()}
@@ -495,10 +495,10 @@ function home() {
 
 function homeProcess() {
   const steps = [
-    ['1', 'Indica metros, ciudad y tipo de pintura.'],
-    ['2', 'Sube fotos para revisar alcance y acceso.'],
-    ['3', 'Obtén precio aproximado y materiales.'],
-    ['4', 'Envía solicitud y recibe seguimiento.']
+    ['1', 'Pon tu WhatsApp.'],
+    ['2', 'Di qué quieres pintar.'],
+    ['3', 'Sube fotos si tienes.'],
+    ['4', 'Recibe precio y seguimiento.']
   ];
   return `
     <div class="client-method" aria-label="Método EMC">
@@ -599,7 +599,7 @@ function quoteStep() {
 }
 
 function stepContext(calc) {
-  const title = state.step === 0 ? 'Datos básicos para contactarte' : state.step < 5 ? 'Cotización orientativa' : 'Revisa antes de enviar';
+  const title = state.step === 0 ? 'Empezamos fácil' : state.step < 5 ? 'Vamos paso a paso' : 'Último paso';
   return `
     <div class="step-context">
       <div>
@@ -614,7 +614,7 @@ function stepContext(calc) {
       ` : `
         <div>
           <span>Estado</span>
-          <strong>En captura</strong>
+          <strong>En proceso</strong>
         </div>
       `}
     </div>
@@ -637,15 +637,15 @@ function stepClient() {
   return `
     <div class="card">
       ${workVisual('/assets/emc-uniforme-interior.png', 'Servicio profesional EMC', 'Pintores con playera azul, logo amarillo y gorra trabajando con protección y control de calidad.')}
-      <h2>Recibe tu precio aproximado</h2>
-      <p class="muted">Primero calculamos una estimación útil. Después EMC te contacta por WhatsApp para validar fotos, medidas y agenda.</p>
+      <h2>Primero tus datos</h2>
+      <p class="muted">Con esto EMC puede mandarte la cotización y preguntarte lo que falte.</p>
       <div class="form-grid">
-        ${input('client.name', 'Nombre completo', 'text', 'required autocomplete="name"')}
-        ${input('client.phone', 'Teléfono WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
-        ${input('client.email', 'Correo opcional', 'email')}
-        ${input('client.address', 'Dirección o zona aproximada', 'text')}
+        ${input('client.name', 'Tu nombre', 'text', 'required autocomplete="name"')}
+        ${input('client.phone', 'Tu WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
+        ${input('client.email', 'Correo si tienes', 'email')}
+        ${input('client.address', 'Colonia o zona', 'text')}
         ${input('client.city', 'Ciudad o municipio', 'text')}
-        ${select('client.propertyType', 'Tipo de inmueble', ['Casa', 'Oficina', 'Local', 'Bodega', 'Edificio', 'Otro'])}
+        ${select('client.propertyType', 'Qué es', ['Casa', 'Oficina', 'Local', 'Bodega', 'Edificio', 'Otro'])}
       </div>
       ${navActions()}
     </div>
@@ -673,26 +673,26 @@ function stepProject() {
     }
   }[p.applicationType] || {
     src: '/assets/emc-uniforme-interior.png',
-    title: 'Detalles del proyecto',
+    title: 'Qué se va a pintar',
     caption: 'No tiene que quedar perfecto. EMC te ayuda a completar la información.'
   };
   return `
     <div class="card visual-card project-visual">
       ${workVisual(projectVisual.src, projectVisual.title, projectVisual.caption)}
       <div>
-        <h2>Detalles del proyecto</h2>
-        <p class="muted">Pon medidas aproximadas. Esta es una orientación inicial; EMC confirmará datos contigo antes de cerrar precio y agenda.</p>
+        <h2>Qué quieres pintar</h2>
+        <p class="muted">Pon un aproximado. Si no sabes los metros exactos: cuarto 30, casa chica 100, casa grande 200.</p>
       </div>
       <div class="form-grid">
-        ${select('project.applicationType', 'Tipo de aplicación', ['Interior', 'Exterior', 'Interior y exterior'])}
-        ${p.applicationType === 'Interior' ? input('project.interiorSquareMeters', 'm² interiores', 'number', 'min="1" inputmode="decimal"') : ''}
-        ${p.applicationType === 'Exterior' ? input('project.exteriorSquareMeters', 'm² exteriores', 'number', 'min="1" inputmode="decimal"') : ''}
+        ${select('project.applicationType', 'Dónde se pinta', ['Interior', 'Exterior', 'Interior y exterior'])}
+        ${p.applicationType === 'Interior' ? input('project.interiorSquareMeters', 'm² aproximados por dentro', 'number', 'min="1" inputmode="decimal"') : ''}
+        ${p.applicationType === 'Exterior' ? input('project.exteriorSquareMeters', 'm² aproximados por fuera', 'number', 'min="1" inputmode="decimal"') : ''}
         ${p.applicationType === 'Interior y exterior' ? `
-          ${input('project.interiorSquareMeters', 'm² interiores', 'number', 'min="0" inputmode="decimal"')}
-          ${input('project.exteriorSquareMeters', 'm² exteriores', 'number', 'min="0" inputmode="decimal"')}
+          ${input('project.interiorSquareMeters', 'm² por dentro', 'number', 'min="0" inputmode="decimal"')}
+          ${input('project.exteriorSquareMeters', 'm² por fuera', 'number', 'min="0" inputmode="decimal"')}
         ` : ''}
-        ${input('project.floors', 'Número de plantas', 'number', 'min="1" inputmode="numeric"')}
-        ${input('project.heightMeters', 'Altura aproximada si la sabes', 'number', 'min="1" step="0.1" inputmode="decimal"')}
+        ${input('project.floors', 'Cuántos pisos', 'number', 'min="1" inputmode="numeric"')}
+        ${input('project.heightMeters', 'Altura si la sabes', 'number', 'min="1" step="0.1" inputmode="decimal"')}
       </div>
       <div class="risk-rule">
         <span>Equipo de acceso</span>
@@ -709,16 +709,16 @@ function stepPhotos() {
   return `
     <div class="card">
       ${workVisual('/assets/emc-uniforme-diagnostico.png', 'Fotos opcionales', 'Si puedes enviar fotos, ayudan mucho. Si no puedes, EMC te orienta por WhatsApp.')}
-      <h2>Fotos o asesoría directa</h2>
-      <p class="muted">Elige la forma más fácil para ti. Puedes subir fotos ahora o pedir que EMC te oriente directo por WhatsApp.</p>
+      <h2>Fotos si tienes</h2>
+      <p class="muted">Si no tienes fotos, no pasa nada. Puedes continuar.</p>
       <div class="photo-help-choice">
         <div>
-          <strong>Subir fotos ahora</strong>
-          <span>Ayuda a estimar mejor el trabajo. No tiene que quedar perfecto.</span>
+          <strong>Sí tengo fotos</strong>
+          <span>Sube las que puedas.</span>
         </div>
         <div>
-          <strong>Quiero asesoría directa</strong>
-          <span>Continúa sin fotos y EMC te contacta para pedirte lo necesario.</span>
+          <strong>No tengo fotos</strong>
+          <span>EMC te las pide por WhatsApp si hacen falta.</span>
         </div>
       </div>
       <div class="photo-upload-panel">
@@ -809,26 +809,26 @@ function stepRecommendation(calc) {
     : `El sistema recomienda mínimo ${recommended.label}`;
   return `
     <div class="card center-card visual-card recommendation-visual">
-      ${workVisual('/assets/emc-uniforme-interior.png', 'Recomendación por nivel de servicio', 'El sistema revisa fotos, área y acceso para recomendar el alcance correcto.')}
+      ${workVisual('/assets/emc-uniforme-interior.png', 'Precio sugerido', 'EMC usa tus datos para darte una idea de precio antes de contactarte.')}
       <div class="success-mark small">✓</div>
-      <h2>Recomendación del sistema EMC</h2>
-      <p class="muted">${minimumText} con lo que nos compartiste. Es una orientación inicial; EMC confirma contigo antes de cerrar precio y agenda.</p>
+      <h2>Precio aproximado</h2>
+      <p class="muted">${minimumText}. EMC confirma contigo antes de cerrar precio y agenda.</p>
       <div class="recommendation-box">
-        <span>Servicio recomendado mínimo</span>
+        <span>Servicio sugerido</span>
         <strong>${recommended.label} · ${recommendedRate}/m²</strong>
         <p>${recommended.short}</p>
       </div>
       ${calc.recommendedLevel === 'premium' ? premiumRecommendationDetail() : ''}
-      <button class="btn btn-ghost btn-soft-action" data-modal="recommendation" type="button">Ver explicación del nivel</button>
-      <p class="service-change-question">Siguiente paso recomendado</p>
+      <button class="btn btn-ghost btn-soft-action" data-modal="recommendation" type="button">Por qué este precio</button>
+      <p class="service-change-question">Qué quieres hacer</p>
       <div class="actions recommendation-actions">
         <button class="btn btn-primary btn-hero" data-action="accept-recommendation" type="button">
-          <strong>Sí, usar esta recomendación</strong>
-          <small>Continuar con el nivel sugerido</small>
+          <strong>Usar este precio</strong>
+          <small>Seguir a pintura y envío</small>
         </button>
         <button class="btn btn-ghost" data-action="choose-service" type="button">
-          <strong>Comparar niveles</strong>
-          <small>Elegir otro alcance por presupuesto</small>
+          <strong>Ver opciones</strong>
+          <small>Más barato o más completo</small>
         </button>
       </div>
       ${state.showServiceOptions ? serviceChoicePanel(calc) : ''}
@@ -858,26 +858,26 @@ function premiumRecommendationDetail() {
 function serviceChoicePanel(calc) {
   return `
     <div class="service-choice-panel">
-      <h3>Escoge nivel de servicio</h3>
-      <p class="muted">Puedes elegir un nivel distinto por presupuesto. Si eliges uno menor al recomendado, EMC lo registrará como alcance limitado.</p>
+      <h3>Elige una opción</h3>
+      <p class="muted">Puedes cambiar el precio sugerido. EMC te dirá por WhatsApp si conviene subir o bajar el servicio.</p>
       <div class="service-choice-grid">
         ${Object.entries(levels).map(([key, level]) => {
           const allowed = isLevelAllowed(key);
           return `
             <div class="service-choice-card ${key === calc.recommendedLevel ? 'recommended' : ''} ${allowed ? '' : 'limited'}" title="${level.when}">
-              <span>${key === calc.recommendedLevel ? 'Recomendado por EMC' : 'Nivel disponible'}</span>
+              <span>${key === calc.recommendedLevel ? 'Sugerido' : 'Opción'}</span>
               <h4>${level.label}</h4>
               <strong>${money(state.config.labor[key])} / m²</strong>
               <p>${level.short}</p>
               <small>${level.scope}</small>
-              ${allowed ? '' : '<small class="lock-note">Alcance limitado: el análisis visual recomienda un nivel superior.</small>'}
-              <button class="btn btn-ghost" data-service-detail="${key}" type="button">Ver servicio extendido</button>
-              <button class="btn btn-primary" data-select-service-level="${key}" type="button">Aceptar nivel de servicio</button>
+              ${allowed ? '' : '<small class="lock-note">Puede quedarse corto para este trabajo.</small>'}
+              <button class="btn btn-ghost" data-service-detail="${key}" type="button">Ver qué incluye</button>
+              <button class="btn btn-primary" data-select-service-level="${key}" type="button">Usar esta opción</button>
             </div>
           `;
         }).join('')}
       </div>
-      <button class="btn btn-dark full-btn" data-action="accept-recommendation" type="button">Aceptar recomendación de sistema EMC</button>
+      <button class="btn btn-dark full-btn" data-action="accept-recommendation" type="button">Usar precio sugerido</button>
     </div>
   `;
 }
@@ -907,9 +907,9 @@ function stepSupply(calc) {
   const sealerDetails = sealerMaterialDetails(calc);
   return `
     <div class="card visual-card supply-visual">
-      ${workVisual('/assets/emc-uniforme-interior.png', 'Materiales y suministro', 'Pintura, sellador y consumibles se calculan y trasladan al cliente según alcance.')}
-      <h2>Suministro de pintura</h2>
-      <p class="muted">Elige si EMC cotiza y suministra pintura/sellador o si el cliente proporcionará los materiales.</p>
+      ${workVisual('/assets/emc-uniforme-interior.png', 'Pintura y materiales', 'Puedes pedir que EMC incluya la pintura o comprarla por tu cuenta.')}
+      <h2>¿Quién compra la pintura?</h2>
+      <p class="muted">Elige la opción más fácil. EMC puede incluir pintura o tú puedes comprarla.</p>
       <div class="material-summary material-ledger" style="margin-top:16px;">
         <div>
           <span>${q.service.selectedLevel ? 'Nivel elegido' : 'Nivel recomendado'}</span>
@@ -931,14 +931,14 @@ function stepSupply(calc) {
       </div>
       <div class="supply-grid">
         <button class="supply-card ${q.service.paintSupply === 'emc' ? 'selected' : ''}" data-paint-supply="emc" type="button">
-          <strong>Quiero que EMC incluya la pintura</strong>
-          <span>EMC calcula pintura, sellador si hace falta y materiales.</span>
-          <small class="supply-help">Recomendado si quieres que EMC te ayude a elegir y cotizar el material correcto.</small>
+          <strong>Que EMC incluya la pintura</strong>
+          <span>EMC calcula y compra.</span>
+          <small class="supply-help">Más fácil para cotizar completo.</small>
         </button>
         <button class="supply-card ${q.service.paintSupply === 'cliente' ? 'selected' : ''}" data-client-supply-continue type="button">
-          <strong>Yo ya tengo la pintura</strong>
-          <span>EMC solo cotiza la mano de obra y revisa si falta algo.</span>
-          <small class="supply-help">Si la pintura no alcanza o no cubre bien, EMC te avisará antes de continuar.</small>
+          <strong>Yo compro la pintura</strong>
+          <span>Continuar sin agregar pintura.</span>
+          <small class="supply-help">EMC solo cotiza mano de obra y preparación.</small>
         </button>
       </div>
       ${q.service.paintSupply === 'emc' ? `
@@ -968,7 +968,7 @@ function stepSupply(calc) {
         ` : '<div class="notice" style="margin-top:14px;">Este servicio no requiere sellador por defecto. EMC podrá recomendarlo si la revisión visual detecta una superficie que lo necesita.</div>'}
       ` : ''}
       <div class="quote-section supply-payment">
-        <h3>Factura y forma de pago</h3>
+        <h3>Pago</h3>
         <div class="form-grid compact-config">
           <label>Factura
             <select data-path="service.invoice">
@@ -1121,15 +1121,15 @@ function stepSummary(calc) {
       ${leadCaptureBox(calc)}
       ${clientQuoteProcess(calc)}
       <div class="client-check">
-        <strong>Condiciones antes de agendar</strong>
-        <span>EMC revisará fotos, medidas, accesos y daños declarados antes de agendar.</span>
-        <span>Si hay daño oculto, cambio de alcance o medidas diferentes, el precio puede ajustarse antes del inicio.</span>
+        <strong>Antes de empezar</strong>
+        <span>EMC revisa tus datos y te confirma por WhatsApp.</span>
+        <span>Si las medidas cambian mucho, el precio puede ajustarse antes de iniciar.</span>
       </div>
       <div class="quote-validity">Vigencia: 15 días naturales. Es una cotización preliminar; EMC confirma contigo medidas, fotos si hacen falta y condiciones antes de iniciar.</div>
       <div class="quote-section feedback-section">
-        <h3>Comentarios para mejorar</h3>
-        <p class="muted">Tu opinión ayuda a EMC a mejorar esta página. Escribe qué te gustó, qué no te gustó o qué te gustaría ver antes de aceptar la cotización.</p>
-        <label>Comentarios o dudas
+        <h3>Mensaje para EMC</h3>
+        <p class="muted">Escribe cualquier duda o detalle. Si no sabes qué poner, déjalo vacío.</p>
+        <label>Duda o comentario
           <textarea data-path="observations" placeholder="Ej. No sé los metros, quiero que me orienten por WhatsApp, no pude subir fotos, quiero visita o confirmación...">${state.quote.observations || ''}</textarea>
         </label>
       </div>
@@ -1717,31 +1717,31 @@ function validationMessage() {
   const q = state.quote;
   syncProjectSquareMeters();
   if (state.step === 0) {
-    if (!q.client.name.trim()) return 'Captura el nombre del cliente.';
-    if (q.client.phone.replace(/\D/g, '').length < 10) return 'Captura un teléfono WhatsApp válido de al menos 10 dígitos.';
+    if (!q.client.name.trim()) return 'Escribe tu nombre.';
+    if (q.client.phone.replace(/\D/g, '').length < 10) return 'Escribe tu WhatsApp con 10 dígitos.';
   }
   if (state.step === 1) {
-    if (projectSquareMeters() <= 0) return 'Captura metros aproximados. Si no sabes, escribe un estimado y EMC lo confirma por WhatsApp.';
+    if (projectSquareMeters() <= 0) return 'Pon metros aproximados. Si no sabes, pon 100 y EMC lo confirma.';
     if (q.project.applicationType === 'Interior y exterior' && (!Number(q.project.interiorSquareMeters || 0) || !Number(q.project.exteriorSquareMeters || 0))) {
-      return 'Si es interior y exterior, pon un aproximado de cada parte. EMC lo puede ajustar contigo después.';
+      return 'Pon un aproximado por dentro y por fuera.';
     }
     if (Number(q.project.heightMeters) > 15) return 'Revisa la altura: parece demasiado alta para una cotización rápida.';
   }
   if (state.step === 2 && photoReviewPending()) return 'Espera unos segundos: el sistema está terminando la revisión de fotos antes de recomendar un nivel.';
   if (state.step === 4 && !q.service.selectedLevel) {
-    return 'Acepta la recomendación EMC o escoge otro nivel de servicio antes de continuar.';
+    return 'Elige usar el precio sugerido para continuar.';
   }
   if (state.step === 4 && isBelowMinimum() && !state.quote.service.riskOverrideAccepted) {
     return 'Para elegir un nivel más barato que el recomendado, acepta que será alcance limitado.';
   }
   if (state.step === 4 && !q.service.paintSupply) {
-    return 'Elige si la pintura será suministrada por EMC o por el cliente.';
+    return 'Elige quién compra la pintura.';
   }
   if (state.step === 4 && q.service.paintSupply === 'emc' && !q.service.paintId) {
-    return 'Selecciona la pintura que quieres que EMC compre o cambia a "Yo compro la pintura".';
+    return 'Elige una pintura o marca "Yo compro la pintura".';
   }
   if (state.step === 4 && q.service.paintSupply === 'emc' && needsSealer(q.service.selectedLevel) && !q.service.sealerId) {
-    return 'Selecciona el sellador para poder cotizarlo completo.';
+    return 'Elige un sellador o cambia a "Yo compro la pintura".';
   }
   if (!q.service.invoice && q.service.paymentMethod === 'DAI Bitso a Bitso' && !daiPaymentAvailable()) {
     return 'El pago en DAI Bitso a Bitso no está disponible. Elige efectivo o pide a EMC activar DAI.';
