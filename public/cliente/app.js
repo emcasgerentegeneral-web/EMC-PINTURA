@@ -51,6 +51,43 @@ const state = {
   lastSavedQuote: null
 };
 
+const analyticsSessionId = (() => {
+  const key = 'emc_analytics_session';
+  const existing = sessionStorage.getItem(key);
+  if (existing) return existing;
+  const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  sessionStorage.setItem(key, id);
+  return id;
+})();
+
+function track(type, detail = {}) {
+  const payload = {
+    type,
+    path: window.location.pathname,
+    title: document.title,
+    referrer: document.referrer,
+    sessionId: analyticsSessionId,
+    view: state.view,
+    step: state.view === 'quote' ? state.step + 1 : null,
+    ...detail
+  };
+  try {
+    const body = JSON.stringify(payload);
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }));
+      return;
+    }
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+      keepalive: true
+    }).catch(() => {});
+  } catch (error) {
+    // La captura de visitas nunca debe impedir que el cliente cotice.
+  }
+}
+
 const stepLabels = [
   'Tus datos',
   'Qué se pinta',
@@ -168,12 +205,14 @@ function setView(view, step = state.step) {
   state.step = step;
   state.modal = null;
   render();
+  track(view === 'quote' ? 'quote_step' : 'pageview', { detail: view, step: view === 'quote' ? step + 1 : null });
   scrollToPageStart();
   window.requestAnimationFrame(scrollToPageStart);
   window.setTimeout(scrollToPageStart, 25);
 }
 
 function startNewQuote() {
+  track('quote_start', { detail: 'calcular ahora' });
   state.quote = initialQuote();
   state.step = 0;
   state.modal = null;
@@ -206,6 +245,7 @@ async function loadConfig() {
     return;
   }
   render();
+  track('pageview', { detail: 'cliente inicio' });
 }
 
 function highestLevel(a, b) {
@@ -1775,7 +1815,10 @@ function bind() {
       const action = button.dataset.action;
       if (action === 'home') setView('home', 0);
       if (action === 'quote') startNewQuote();
-      if (action === 'work') setView('work', 0);
+      if (action === 'work') {
+        track('collaborator_start', { detail: 'red emc' });
+        setView('work', 0);
+      }
       if (action === 'how') setView('how', 0);
       if (action === 'prev') {
         if (state.view === 'quote' && state.step === 0) {
@@ -1994,6 +2037,12 @@ function bind() {
       button.classList.add('selected');
     });
   });
+
+  document.querySelectorAll('a[href*="wa.me"], a[href*="whatsapp"]').forEach(link => {
+    link.addEventListener('click', () => {
+      track('whatsapp_click', { detail: link.textContent.trim().slice(0, 120) });
+    });
+  });
 }
 
 function compressImage(file, label) {
@@ -2115,6 +2164,7 @@ async function acceptQuote() {
     body: JSON.stringify(payload)
   });
   state.lastSavedQuote = await response.json();
+  track('quote_sent', { detail: state.lastSavedQuote.folio || 'cotizacion enviada' });
   state.quote = initialQuote();
   state.photoAnalysis = null;
   state.photoAnalysisSignature = '';
@@ -2156,6 +2206,7 @@ async function sendCollaborator() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
+  track('collaborator_sent', { detail: payload.city || 'colaborador enviado' });
   alert('Registro enviado. EMC revisará si hay una oportunidad compatible por evento.');
   setView('home', 0);
 }

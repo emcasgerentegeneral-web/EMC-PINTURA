@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Visitas | EMC Pintura</title>
+    <link rel="stylesheet" href="/admin/visitas/visitas.css">
+  </head>
+  <body>
+    <main class="visits-shell">
+      <section class="hero">
+        <div>
+          <span>EMC Pintura</span>
+          <h1>Visitas y clientes</h1>
+          <p>Un tablero simple para saber si la página está trayendo gente.</p>
+        </div>
+        <button id="refresh" type="button">Actualizar</button>
+      </section>
+
+      <section id="login" class="panel login-panel">
+        <h2>Entrar</h2>
+        <p>Escribe tu clave de EMC para ver las visitas.</p>
+        <form id="login-form">
+          <label>Clave
+            <input id="password" type="password" autocomplete="current-password" required>
+          </label>
+          <button type="submit">Ver visitas</button>
+        </form>
+        <small>Es la misma clave del panel EMC, salvo que configures una clave especial de visitas.</small>
+      </section>
+
+      <section id="dashboard" class="dashboard" hidden>
+        <div class="cards">
+          <article>
+            <span>Hoy</span>
+            <strong id="todayVisits">0</strong>
+            <small>visitas</small>
+          </article>
+          <article>
+            <span>Personas hoy</span>
+            <strong id="todayPeople">0</strong>
+            <small>aproximado</small>
+          </article>
+          <article>
+            <span>7 días</span>
+            <strong id="last7Visits">0</strong>
+            <small>visitas</small>
+          </article>
+          <article>
+            <span>30 días</span>
+            <strong id="last30Visits">0</strong>
+            <small>visitas</small>
+          </article>
+          <article>
+            <span>Iniciaron cotización</span>
+            <strong id="quoteStarts">0</strong>
+            <small>clic en calcular</small>
+          </article>
+          <article>
+            <span>Cotizaciones enviadas</span>
+            <strong id="quoteSent">0</strong>
+            <small>leads reales</small>
+          </article>
+          <article>
+            <span>WhatsApp</span>
+            <strong id="whatsappClicks">0</strong>
+            <small>clics</small>
+          </article>
+        </div>
+
+        <section class="grid">
+          <article class="panel">
+            <h2>Páginas más visitadas</h2>
+            <div id="topPages" class="list"></div>
+          </article>
+          <article class="panel">
+            <h2>De dónde llegaron</h2>
+            <div id="topReferrers" class="list"></div>
+          </article>
+        </section>
+
+        <section class="panel">
+          <h2>Últimos movimientos</h2>
+          <div id="recent" class="recent"></div>
+        </section>
+      </section>
+    </main>
+    <script src="/admin/visitas/visitas.js"></script>
+  </body>
+</html>
