@@ -519,7 +519,7 @@ function home() {
             <small>Gratis y sin compromiso</small>
           </button>
         </div>
-        ${whatsappUrl() ? `<a class="home-whatsapp-link" href="${whatsappUrl()}" target="_blank" rel="noopener">Prefiero escribir por WhatsApp</a>` : ''}
+        ${whatsappUrl() ? `<a class="home-whatsapp-link" href="${whatsappUrl()}" target="_blank" rel="noopener" aria-label="Prefiero atención por WhatsApp"><span aria-hidden="true">WhatsApp</span>Prefiero atención por WhatsApp</a>` : ''}
       </div>
     </section>
     <section class="seo-strip" aria-label="Servicios de pintura">

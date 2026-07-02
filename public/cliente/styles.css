@@ -2363,11 +2363,47 @@ body {
 .home-whatsapp-link {
   width: fit-content;
   margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: #f3f7fb;
   font-size: 15px;
   font-weight: 850;
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+.home-whatsapp-link span {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #25d366;
+  color: transparent;
+  display: inline-block;
+  position: relative;
+  flex: 0 0 auto;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.home-whatsapp-link span::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.home-whatsapp-link span::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  bottom: 4px;
+  width: 7px;
+  height: 7px;
+  background: #25d366;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-20deg);
 }
 
 .home-whatsapp-link:hover {
