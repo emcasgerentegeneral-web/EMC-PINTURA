@@ -2361,21 +2361,32 @@ body {
 }
 
 .home-whatsapp-link {
-  width: fit-content;
-  margin-top: 12px;
+  width: min(100%, 430px);
+  min-height: 70px;
+  margin-top: 14px;
+  padding: 13px 14px 13px 18px;
+  border: 1px solid rgba(37, 211, 102, 0.48);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 16px;
   color: #f3f7fb;
-  font-size: 15px;
-  font-weight: 850;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  text-decoration: none;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+}
+
+.home-whatsapp-link strong {
+  color: inherit;
+  font-size: 17px;
+  font-weight: 950;
+  line-height: 1.18;
 }
 
 .home-whatsapp-link span {
-  width: 24px;
-  height: 24px;
+  width: 46px;
+  height: 46px;
   border-radius: 999px;
   background: #25d366;
   color: transparent;
@@ -2388,21 +2399,21 @@ body {
 .home-whatsapp-link span::before {
   content: "";
   position: absolute;
-  inset: 5px;
-  border: 2px solid #fff;
+  inset: 10px;
+  border: 3px solid #fff;
   border-radius: 50%;
 }
 
 .home-whatsapp-link span::after {
   content: "";
   position: absolute;
-  left: 6px;
-  bottom: 4px;
-  width: 7px;
-  height: 7px;
+  left: 12px;
+  bottom: 9px;
+  width: 12px;
+  height: 12px;
   background: #25d366;
-  border-left: 2px solid #fff;
-  border-bottom: 2px solid #fff;
+  border-left: 3px solid #fff;
+  border-bottom: 3px solid #fff;
   transform: rotate(-20deg);
 }
 
