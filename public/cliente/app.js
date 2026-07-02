@@ -518,8 +518,8 @@ function home() {
             <strong>Calcular ahora</strong>
             <small>Gratis y sin compromiso</small>
           </button>
-          ${whatsappUrl() ? `<a class="btn btn-light" href="${whatsappUrl()}" target="_blank" rel="noopener"><strong>Enviar WhatsApp</strong><small>Hablar con EMC Pintura</small></a>` : ''}
         </div>
+        ${whatsappUrl() ? `<a class="home-whatsapp-link" href="${whatsappUrl()}" target="_blank" rel="noopener">Prefiero escribir por WhatsApp</a>` : ''}
       </div>
     </section>
     <section class="seo-strip" aria-label="Servicios de pintura">
@@ -527,9 +527,7 @@ function home() {
         <strong>Servicios de pintura para casas, fachadas, oficinas, bardas y locales</strong>
         <span>Atención principal en Villahermosa/Centro, Nacajuca, Jalpa de Méndez y Cunduacán.</span>
       </div>
-      <button class="btn btn-dark" data-action="quote" type="button">Calcular precio</button>
     </section>
-    ${whatsappCta()}
   `;
 }
 

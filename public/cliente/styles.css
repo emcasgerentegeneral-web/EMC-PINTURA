@@ -2360,6 +2360,20 @@ body {
   min-width: 190px;
 }
 
+.home-whatsapp-link {
+  width: fit-content;
+  margin-top: 12px;
+  color: #f3f7fb;
+  font-size: 15px;
+  font-weight: 850;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.home-whatsapp-link:hover {
+  color: var(--yellow);
+}
+
 .client-method {
   width: min(100%, 760px);
   margin: 0 0 28px;
@@ -3589,10 +3603,9 @@ a.btn {
   padding: 18px clamp(18px, 4vw, 64px);
   background: #ffffff;
   color: var(--navy);
-  display: flex;
+  display: grid;
   align-items: center;
   justify-content: center;
-  gap: 18px;
   border-bottom: 1px solid var(--line);
 }
 
