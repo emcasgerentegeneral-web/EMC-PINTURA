@@ -3,20 +3,26 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const seoDir = path.join(root, 'public', 'seo');
-const siteUrl = 'https://emc-pintura-cliente.onrender.com';
+const siteUrl = 'https://emc-pintura.onrender.com';
 
-const locations = [
+const targetLocations = [
   'Villahermosa',
   'Centro',
+  'Nacajuca',
+  'Jalpa de Mendez',
+  'Cunduacan'
+];
+
+const archivedLocations = [
   'Cardenas',
   'Comalcalco',
   'Paraiso',
-  'Nacajuca',
-  'Jalpa de Mendez',
-  'Cunduacan',
   'Macuspana',
   'Teapa'
 ];
+
+const locations = [...targetLocations, ...archivedLocations];
+const targetLocationSet = new Set(targetLocations);
 
 const services = [
   ['pintar casa', 'pintar una casa'],
@@ -45,9 +51,25 @@ function titleCase(text) {
   return text.replace(/\b[a-z]/g, char => char.toUpperCase());
 }
 
-function pageHtml({ location, service, intent, fileSlug }) {
+function zoneCopy(location) {
+  const zones = {
+    Villahermosa: 'Villahermosa y zona conurbada de Centro',
+    Centro: 'Centro, Tabasco, incluyendo Villahermosa y colonias cercanas',
+    Nacajuca: 'Nacajuca y rutas cercanas hacia Centro',
+    'Jalpa de Mendez': 'Jalpa de Mendez y comunidades cercanas',
+    Cunduacan: 'Cunduacan y zona cercana a Villahermosa'
+  };
+  return zones[location] || `${location}, Tabasco`;
+}
+
+function pageHtml({ location, service, intent, fileSlug, isTargetLocation }) {
   const title = `${titleCase(service)} en ${location} | EMC Pintura`;
-  const description = `Conoce cuanto cuesta ${intent} en ${location}, Tabasco. Calcula precio aproximado con mano de obra, materiales y seguimiento por WhatsApp con EMC Pintura.`;
+  const serviceZone = zoneCopy(location);
+  const description = `Conoce cuanto cuesta ${intent} en ${location}, Tabasco. EMC Pintura atiende Centro, Villahermosa, Nacajuca, Jalpa de Mendez y Cunduacan con estimado por WhatsApp.`;
+  const robots = isTargetLocation ? 'index,follow' : 'noindex,follow';
+  const serviceNotice = isTargetLocation
+    ? `<p>La atencion principal de EMC Pintura se concentra en Centro/Villahermosa, Nacajuca, Jalpa de Mendez y Cunduacan. Asi podemos revisar mejor fotos, ubicacion, alcance y tiempos antes de confirmar una cotizacion profesional.</p>`
+    : `<p>Actualmente EMC Pintura enfoca su atencion principal en Centro/Villahermosa, Nacajuca, Jalpa de Mendez y Cunduacan. Si tu proyecto esta fuera de estas zonas, puedes dejar tus datos y EMC valida si existe disponibilidad antes de confirmar.</p>`;
   return `<!doctype html>
 <html lang="es">
   <head>
@@ -55,7 +77,7 @@ function pageHtml({ location, service, intent, fileSlug }) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${title}</title>
     <meta name="description" content="${description}">
-    <meta name="robots" content="index,follow">
+    <meta name="robots" content="${robots}">
     <link rel="canonical" href="${siteUrl}/seo/${fileSlug}/">
     <style>
       :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --navy:#071d36; --yellow:#ffd21f; --line:#d9e2ef; --muted:#526174; }
@@ -85,7 +107,7 @@ function pageHtml({ location, service, intent, fileSlug }) {
     <header>
       <img src="/assets/emc-logo.jpg" alt="EMC Pintura">
       <h1>${titleCase(service)} en ${location}: calcula tu precio aproximado</h1>
-      <p class="lead">EMC Pintura te ayuda a estimar cuanto cuesta ${intent} con mano de obra, preparacion, materiales opcionales y seguimiento profesional.</p>
+      <p class="lead">EMC Pintura te ayuda a estimar cuanto cuesta ${intent} en ${serviceZone}, con mano de obra, preparacion, materiales opcionales y seguimiento por WhatsApp.</p>
       <div class="cta-row">
         <a class="button" href="/cliente/?start=quote">Calcular ahora</a>
         <a class="button secondary" href="/cliente/?start=quote">Pedir cotizacion profesional</a>
@@ -95,7 +117,8 @@ function pageHtml({ location, service, intent, fileSlug }) {
       <section>
         <h2>Cuanto cuesta ${intent} en ${location}</h2>
         <p>El precio depende de los metros cuadrados, estado de la superficie, altura, acceso, preparacion necesaria, numero de manos y si EMC suministra pintura y sellador. Por eso una cotizacion responsable no debe ser solo una cifra suelta.</p>
-        <p>Con la calculadora de EMC Pintura puedes capturar datos del proyecto, subir fotos y obtener un total preliminar antes de solicitar la revision final.</p>
+        ${serviceNotice}
+        <p>Con la calculadora de EMC Pintura puedes capturar datos del proyecto, subir fotos y obtener un total preliminar antes de solicitar la revision final por WhatsApp.</p>
       </section>
       <section>
         <h2>Que incluye una cotizacion EMC</h2>
@@ -112,7 +135,12 @@ function pageHtml({ location, service, intent, fileSlug }) {
           <li>Toma fotos generales, de danos, de acceso y de detalle.</li>
           <li>Define si quieres interior, exterior o ambos.</li>
           <li>Indica si quieres que EMC incluya pintura y sellador.</li>
+          <li>Escribe tu colonia o referencia para confirmar si entra en la zona de atencion.</li>
         </ul>
+      </section>
+      <section>
+        <h2>Zonas donde EMC puede atender mejor</h2>
+        <p>Para cuidar tiempos, calidad y seguimiento, EMC Pintura enfoca sus solicitudes en Villahermosa/Centro, Nacajuca, Jalpa de Mendez y Cunduacan. Si tu proyecto esta cerca de estas zonas, puedes iniciar con el calculo gratuito y despues se valida disponibilidad.</p>
       </section>
       <section>
         <h2>Calcula gratis en menos de 60 segundos</h2>
@@ -132,11 +160,14 @@ fs.mkdirSync(seoDir, { recursive: true });
 const pages = [];
 for (const location of locations) {
   for (const [service, intent] of services) {
+    const isTargetLocation = targetLocationSet.has(location);
     const fileSlug = `${slug(service)}-${slug(location)}`;
     const dir = path.join(seoDir, fileSlug);
     fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, 'index.html'), pageHtml({ location, service, intent, fileSlug }));
-    pages.push(`/seo/${fileSlug}/`);
+    fs.writeFileSync(path.join(dir, 'index.html'), pageHtml({ location, service, intent, fileSlug, isTargetLocation }));
+    if (isTargetLocation) {
+      pages.push(`/seo/${fileSlug}/`);
+    }
   }
 }
 
@@ -153,4 +184,4 @@ Allow: /
 Sitemap: ${siteUrl}/sitemap.xml
 `);
 
-console.log(`Generated ${pages.length} SEO pages.`);
+console.log(`Generated ${pages.length} target SEO pages and ${archivedLocations.length * services.length} archived noindex pages.`);

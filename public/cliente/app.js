@@ -504,7 +504,7 @@ function home() {
     <section class="home">
       <div class="home-card">
         <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
-        <p class="division">EMC Pintura en Villahermosa y Tabasco</p>
+        <p class="division">EMC Pintura en Villahermosa, Centro y zona cercana</p>
         <h1>Dinos qué vas a pintar y te damos un precio aproximado.</h1>
         <p class="home-tagline">No necesitas saber de pintura. Pon datos aproximados y EMC te confirma por WhatsApp.</p>
         <div class="benefits">
@@ -525,7 +525,7 @@ function home() {
     <section class="seo-strip" aria-label="Servicios de pintura">
       <div>
         <strong>Servicios de pintura para casas, fachadas, oficinas, bardas y locales</strong>
-        <span>Atención en Villahermosa, Centro, Cárdenas, Comalcalco, Paraíso, Nacajuca y más zonas de Tabasco.</span>
+        <span>Atención principal en Villahermosa/Centro, Nacajuca, Jalpa de Méndez y Cunduacán.</span>
       </div>
       <button class="btn btn-dark" data-action="quote" type="button">Calcular precio</button>
     </section>
