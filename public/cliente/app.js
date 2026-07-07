@@ -4,11 +4,14 @@ function initialQuote() {
   return {
     client: {
       name: '',
+      company: '',
       phone: '',
       email: '',
       address: '',
       city: '',
-      propertyType: 'Casa'
+      propertyType: 'Casa',
+      serviceNeed: 'Pintura',
+      urgency: 'Esta semana'
     },
     project: {
       squareMeters: '',
@@ -186,6 +189,27 @@ function whatsappUrl(text = 'Hola, quiero una cotización para pintar mi casa co
   const phone = businessWhatsapp();
   const message = encodeURIComponent(text);
   return phone ? `https://wa.me/${phone}?text=${message}` : '';
+}
+
+function leadWhatsappText(calc = calculate(), savedQuote = null) {
+  const q = savedQuote || state.quote;
+  const client = q.client || {};
+  const project = q.project || {};
+  const folio = savedQuote?.folio ? `\nFolio: ${savedQuote.folio}` : '';
+  return [
+    'Hola, quiero una cotización con EMCAS.',
+    folio,
+    `Nombre: ${client.name || '-'}`,
+    `Empresa: ${client.company || '-'}`,
+    `WhatsApp: ${client.phone || '-'}`,
+    `Municipio: ${client.city || '-'}`,
+    `Tipo de cliente: ${client.propertyType || '-'}`,
+    `Servicio: ${client.serviceNeed || 'Pintura'}`,
+    `Urgencia: ${client.urgency || '-'}`,
+    `Área aproximada: ${project.squareMeters || project.interiorSquareMeters || project.exteriorSquareMeters || '-'} m²`,
+    `Total preliminar: ${money(calc.total)}`,
+    `Comentarios: ${q.observations || '-'}`
+  ].filter(Boolean).join('\n');
 }
 
 function whatsappCta(className = 'floating-whatsapp') {
@@ -504,9 +528,9 @@ function home() {
     <section class="home">
       <div class="home-card">
         <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
-        <p class="division">EMC Pintura en Villahermosa, Centro y zona cercana</p>
-        <h1>Dinos qué vas a pintar y te damos un precio aproximado.</h1>
-        <p class="home-tagline">No necesitas saber de pintura. Pon datos aproximados y EMC te confirma por WhatsApp.</p>
+        <p class="division">EMCAS en Villahermosa, Centro y municipios cercanos</p>
+        <h1>Cotiza pintura, mantenimiento eléctrico, herrería o suministros.</h1>
+        <p class="home-tagline">Deja tus datos, calcula un estimado inicial y EMCAS te confirma por WhatsApp.</p>
         <div class="benefits">
           <span>Gratis</span>
           <span>Rápido</span>
@@ -519,13 +543,13 @@ function home() {
             <small>Gratis y sin compromiso</small>
           </button>
         </div>
-        ${whatsappUrl() ? `<a class="home-whatsapp-link" href="${whatsappUrl()}" target="_blank" rel="noopener" aria-label="Presiona aquí si prefieres atención por WhatsApp"><strong>Presiona aquí si prefieres atención por WhatsApp</strong><span aria-hidden="true">WhatsApp</span></a>` : ''}
+        ${whatsappUrl('Hola, quiero cotizar un servicio con EMCAS.') ? `<a class="home-whatsapp-link" href="${whatsappUrl('Hola, quiero cotizar un servicio con EMCAS.')}" target="_blank" rel="noopener" aria-label="Presiona aquí si prefieres atención por WhatsApp"><strong>Presiona aquí si prefieres atención por WhatsApp</strong><span aria-hidden="true">WhatsApp</span></a>` : ''}
       </div>
     </section>
     <section class="seo-strip" aria-label="Servicios de pintura">
       <div>
-        <strong>Servicios de pintura para casas, fachadas, oficinas, bardas y locales</strong>
-        <span>Atención principal en Villahermosa/Centro, Nacajuca, Jalpa de Méndez y Cunduacán.</span>
+        <strong>Servicios para locales, restaurantes, clínicas, bodegas, escuelas y casas</strong>
+        <span>Pintura, mantenimiento general, mantenimiento eléctrico, herrería y suministros en Villahermosa/Centro, Nacajuca, Jalpa de Méndez y Cunduacán.</span>
       </div>
     </section>
   `;
@@ -534,7 +558,7 @@ function home() {
 function homeProcess() {
   const steps = [
     ['1', 'Pon tu WhatsApp.'],
-    ['2', 'Di qué quieres pintar.'],
+    ['2', 'Di qué servicio necesitas.'],
     ['3', 'Sube fotos si tienes.'],
     ['4', 'Recibe precio y seguimiento.']
   ];
@@ -545,7 +569,7 @@ function homeProcess() {
         ${steps.map(([title, text], index) => `
           <div class="client-method-card">
             <small>${title}</small>
-            <strong>${index === 0 ? 'Datos' : index === 1 ? 'Fotos' : index === 2 ? 'Precio' : 'Contacto'}</strong>
+          <strong>${index === 0 ? 'Datos' : index === 1 ? 'Fotos' : index === 2 ? 'Precio' : 'Contacto'}</strong>
             <em>${text}</em>
           </div>
         `).join('')}
@@ -565,7 +589,7 @@ function topbar(subtitle) {
         </span>
       </button>
       <div class="topbar-title">
-        <strong>División Pintura</strong>
+          <strong>División Servicios</strong>
         <span>${subtitle}</span>
       </div>
     </header>
@@ -676,14 +700,17 @@ function stepClient() {
     <div class="card">
       ${workVisual('/assets/emc-uniforme-interior.png', 'Servicio profesional EMC', 'Pintores con playera azul, logo amarillo y gorra trabajando con protección y control de calidad.')}
       <h2>Primero tus datos</h2>
-      <p class="muted">Con esto EMC puede mandarte la cotización y preguntarte lo que falte.</p>
+      <p class="muted">Con esto EMCAS puede mandarte la cotización y preguntarte lo que falte.</p>
       <div class="form-grid">
         ${input('client.name', 'Tu nombre', 'text', 'required autocomplete="name"')}
+        ${input('client.company', 'Empresa o negocio', 'text', 'autocomplete="organization" placeholder="Ej. restaurante, clínica, escuela, local..."')}
         ${input('client.phone', 'Tu WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
         ${input('client.email', 'Correo si tienes', 'email')}
         ${input('client.address', 'Colonia o zona', 'text')}
-        ${input('client.city', 'Ciudad o municipio', 'text')}
-        ${select('client.propertyType', 'Qué es', ['Casa', 'Oficina', 'Local', 'Bodega', 'Edificio', 'Otro'])}
+        ${select('client.city', 'Ciudad o municipio', ['Villahermosa / Centro', 'Cunduacán', 'Jalpa de Méndez', 'Nacajuca', 'Otro'])}
+        ${select('client.propertyType', 'Qué es', ['Casa', 'Oficina', 'Local', 'Restaurante', 'Clínica', 'Bodega', 'Escuela', 'Edificio', 'Otro'])}
+        ${select('client.serviceNeed', 'Servicio principal', ['Pintura', 'Mantenimiento general', 'Mantenimiento eléctrico', 'Herrería', 'Suministros', 'Varios'])}
+        ${select('client.urgency', 'Cuándo lo necesitas', ['Urgente', 'Esta semana', 'Este mes', 'Estoy comparando precios'])}
       </div>
       ${navActions()}
     </div>
@@ -1176,8 +1203,8 @@ function stepSummary(calc) {
           <strong>Quiero mi cotización profesional</strong>
           <small>Enviar solicitud a EMC Pintura</small>
         </button>
-        ${whatsappUrl(`Hola, quiero una cotización profesional de EMC Pintura. Mi total preliminar es ${money(calc.total)}.`) ? `
-          <a class="btn btn-dark" href="${whatsappUrl(`Hola, quiero una cotización profesional de EMC Pintura. Mi total preliminar es ${money(calc.total)}.`)}" target="_blank" rel="noopener">
+        ${whatsappUrl(leadWhatsappText(calc)) ? `
+          <a class="btn btn-dark" href="${whatsappUrl(leadWhatsappText(calc))}" target="_blank" rel="noopener">
             <strong>Enviar por WhatsApp</strong>
             <small>Hablar ahora con EMC</small>
           </a>
@@ -1289,14 +1316,19 @@ function summary(calc) {
     </div>
     <div class="quote-kpis">
       <div><span>Cliente</span><strong>${q.client.name || 'Pendiente'}</strong></div>
+      <div><span>Servicio solicitado</span><strong>${q.client.serviceNeed || 'Pintura'}</strong></div>
+      <div><span>Urgencia</span><strong>${q.client.urgency || 'Pendiente'}</strong></div>
       <div><span>Área</span><strong>${m2} m²</strong></div>
-      <div><span>Servicio</span><strong>${levels[calc.level].label}</strong></div>
       <div><span>Tiempo</span><strong>${calc.estimatedDays} día(s)</strong></div>
     </div>
     <div class="quote-layout">
       <div class="quote-section">
         <h3>Datos del proyecto</h3>
+        <div class="summary-line"><span>Empresa</span><strong>${q.client.company || 'Pendiente'}</strong></div>
         <div class="summary-line"><span>Teléfono</span><strong>${q.client.phone || 'Pendiente'}</strong></div>
+        <div class="summary-line"><span>Tipo de cliente</span><strong>${q.client.propertyType || 'Pendiente'}</strong></div>
+        <div class="summary-line"><span>Servicio solicitado</span><strong>${q.client.serviceNeed || 'Pintura'}</strong></div>
+        <div class="summary-line"><span>Urgencia</span><strong>${q.client.urgency || 'Pendiente'}</strong></div>
         <div class="summary-line"><span>Dirección</span><strong>${q.client.address || 'Pendiente'}</strong></div>
         <div class="summary-line"><span>Ciudad</span><strong>${q.client.city || 'Pendiente'}</strong></div>
         <div class="summary-line"><span>Altura</span><strong>${q.project.heightMeters} m</strong></div>
@@ -1681,7 +1713,7 @@ function workForm() {
 
 function success() {
   const quote = state.lastSavedQuote || {};
-  const whatsapp = whatsappUrl(`Hola, ya envié mi solicitud en EMC Pintura. Folio: ${quote.folio || ''}. Total preliminar: ${money(quote.calculation?.total)}.`);
+  const whatsapp = whatsappUrl(leadWhatsappText(quote.calculation || {}, quote));
   return `
     ${topbar('Cotización enviada')}
     <section class="screen">
@@ -1689,11 +1721,11 @@ function success() {
         <div class="success-mark">✓</div>
         <h2>Recibimos tu solicitud</h2>
         <p>Folio: <strong>${quote.folio}</strong></p>
-        <p class="muted">EMC Pintura revisará tus datos, fotos y condiciones capturadas para confirmar alcance y agenda.</p>
+        <p class="muted">EMCAS revisará tus datos, fotos y condiciones capturadas para confirmar alcance y agenda.</p>
         <div class="success-summary">
           <span>Total preliminar</span>
           <strong>${money(quote.calculation?.total)}</strong>
-          <small>${quote.client?.name || ''} · ${quote.project?.squareMeters || '-'} m² · ${quote.project?.applicationType || '-'}</small>
+          <small>${quote.client?.name || ''} · ${quote.client?.serviceNeed || 'Pintura'} · ${quote.client?.city || '-'} · ${quote.project?.squareMeters || '-'} m²</small>
         </div>
         ${whatsapp ? `<a class="btn btn-dark" href="${whatsapp}" target="_blank" rel="noopener">Continuar por WhatsApp</a>` : ''}
         <button class="btn btn-ghost" data-action="copy-summary">Copiar resumen</button>
@@ -1800,7 +1832,12 @@ function quoteShareText() {
     `Cotización EMC Pintura`,
     `Folio: ${q.folio}`,
     `Cliente: ${q.client?.name || '-'}`,
-    `Servicio: ${levelName}`,
+    `Empresa: ${q.client?.company || '-'}`,
+    `WhatsApp: ${q.client?.phone || '-'}`,
+    `Municipio: ${q.client?.city || '-'}`,
+    `Tipo: ${q.client?.propertyType || '-'}`,
+    `Servicio solicitado: ${q.client?.serviceNeed || levelName}`,
+    `Urgencia: ${q.client?.urgency || '-'}`,
     `Área: ${q.project?.squareMeters || '-'} m²`,
     `Total preliminar: ${money(c.total)}`,
     `Estatus: ${q.status || 'Nueva'}`

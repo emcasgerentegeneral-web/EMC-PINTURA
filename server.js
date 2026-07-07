@@ -146,8 +146,8 @@ async function saveConfigRecord(config) {
   return rows?.[0]?.payload || config;
 }
 
-function quoteRow(quote) {
-  return {
+function quoteRow(quote, { extended = true } = {}) {
+  const row = {
     folio: quote.folio,
     status: quote.status || 'Nueva',
     created_at: quote.createdAt,
@@ -159,6 +159,13 @@ function quoteRow(quote) {
     total: Number(quote.calculation?.total || 0),
     payload: quote
   };
+  if (extended) {
+    row.client_company = quote.client?.company || '';
+    row.client_type = quote.client?.propertyType || '';
+    row.service_need = quote.client?.serviceNeed || '';
+    row.urgency = quote.client?.urgency || '';
+  }
+  return row;
 }
 
 function collaboratorRow(record) {
@@ -193,11 +200,21 @@ async function createQuoteRecord(quote) {
     writeJson(QUOTES_FILE, quotes);
     return quote;
   }
-  const rows = await supabaseRequest('emc_quotes', {
-    method: 'POST',
-    body: quoteRow(quote),
-    prefer: 'return=representation'
-  });
+  let rows;
+  try {
+    rows = await supabaseRequest('emc_quotes', {
+      method: 'POST',
+      body: quoteRow(quote),
+      prefer: 'return=representation'
+    });
+  } catch (error) {
+    if (!/client_company|client_type|service_need|urgency|schema cache|column/i.test(error.message)) throw error;
+    rows = await supabaseRequest('emc_quotes', {
+      method: 'POST',
+      body: quoteRow(quote, { extended: false }),
+      prefer: 'return=representation'
+    });
+  }
   return rows?.[0]?.payload || quote;
 }
 
@@ -214,12 +231,23 @@ async function updateQuoteRecord(quoteFolio, changes) {
     return quote;
   }
 
-  const rows = await supabaseRequest('emc_quotes', {
-    method: 'PATCH',
-    query: `?folio=eq.${encodeURIComponent(quoteFolio)}`,
-    body: quoteRow(quote),
-    prefer: 'return=representation'
-  });
+  let rows;
+  try {
+    rows = await supabaseRequest('emc_quotes', {
+      method: 'PATCH',
+      query: `?folio=eq.${encodeURIComponent(quoteFolio)}`,
+      body: quoteRow(quote),
+      prefer: 'return=representation'
+    });
+  } catch (error) {
+    if (!/client_company|client_type|service_need|urgency|schema cache|column/i.test(error.message)) throw error;
+    rows = await supabaseRequest('emc_quotes', {
+      method: 'PATCH',
+      query: `?folio=eq.${encodeURIComponent(quoteFolio)}`,
+      body: quoteRow(quote, { extended: false }),
+      prefer: 'return=representation'
+    });
+  }
   return rows?.[0]?.payload || quote;
 }
 
@@ -280,6 +308,12 @@ async function deleteCollaboratorRecord(collaboratorId) {
 
 function analyticsAccessAllowed(req, url) {
   const configuredPassword = process.env.VISITS_PASSWORD || ADMIN_PASSWORD;
+  const queryPassword = url.searchParams.get('clave') || '';
+  return isAdmin(req) || (configuredPassword && queryPassword === configuredPassword);
+}
+
+function recordsAccessAllowed(req, url) {
+  const configuredPassword = process.env.RECORDS_PASSWORD || process.env.VISITS_PASSWORD || ADMIN_PASSWORD;
   const queryPassword = url.searchParams.get('clave') || '';
   return isAdmin(req) || (configuredPassword && queryPassword === configuredPassword);
 }
@@ -430,6 +464,52 @@ function analyticsSummary(events) {
   };
 }
 
+function quoteRecordSummary(quote) {
+  const client = quote.client || quote.customer || {};
+  const project = quote.project || {};
+  const calculation = quote.calculation || {};
+  return {
+    folio: quote.folio || '',
+    status: quote.status || 'Nueva',
+    createdAt: quote.createdAt || quote.created_at || '',
+    validUntil: quote.validUntil || '',
+    name: client.name || '',
+    company: client.company || '',
+    phone: client.phone || '',
+    email: client.email || '',
+    address: client.address || '',
+    city: client.city || '',
+    propertyType: client.propertyType || '',
+    serviceNeed: client.serviceNeed || calculation.levelLabel || calculation.level || '',
+    urgency: client.urgency || '',
+    area: calculation.area ?? project.squareMeters ?? project.totalSquareMeters ?? '',
+    level: calculation.levelLabel || calculation.level || '',
+    paintSupply: quote.service?.paintSupply || '',
+    total: Number(calculation.totalWithIva ?? calculation.finalTotal ?? calculation.total ?? 0),
+    observations: quote.observations || '',
+    adminNotes: quote.adminNotes || ''
+  };
+}
+
+function sameCalendarDay(value, reference = new Date()) {
+  if (!value) return false;
+  return new Date(value).toISOString().slice(0, 10) === reference.toISOString().slice(0, 10);
+}
+
+function recordsSummary(quotes) {
+  const records = quotes.map(quoteRecordSummary);
+  return {
+    updatedAt: new Date().toISOString(),
+    totals: {
+      total: records.length,
+      newQuotes: records.filter(record => record.status === 'Nueva').length,
+      urgentQuotes: records.filter(record => /urgente/i.test(record.urgency)).length,
+      todayQuotes: records.filter(record => sameCalendarDay(record.createdAt)).length
+    },
+    records
+  };
+}
+
 function send(res, status, body, contentType = 'application/json; charset=utf-8') {
   res.writeHead(status, {
     'Content-Type': contentType,
@@ -532,24 +612,29 @@ async function sendEmailAlert({ subject, text, html }) {
 
 function notifyNewQuote(req, quote) {
   const adminUrl = getAdminPanelUrl(req);
-  const customer = quote.customer || {};
+  const customer = quote.client || quote.customer || {};
   const project = quote.project || {};
   const calculation = quote.calculation || {};
-  const subject = `EMC Pintura: nueva solicitud ${quote.folio}`;
+  const subject = `EMCAS: nueva solicitud ${quote.folio}`;
   const total = calculation.totalWithIva ?? calculation.finalTotal ?? calculation.total ?? 0;
-  const level = calculation.levelLabel || calculation.level || project.selectedLevel || 'Pendiente';
+  const level = customer.serviceNeed || calculation.levelLabel || calculation.level || project.selectedLevel || 'Pendiente';
   const area = calculation.area ?? project.squareMeters ?? project.totalSquareMeters ?? '';
   const lines = [
     'Revisa el panel EMC. Tienes una solicitud nueva.',
     '',
     `Folio: ${quote.folio}`,
     `Cliente: ${customer.name || 'Sin nombre'}`,
+    `Empresa: ${customer.company || 'Sin empresa'}`,
     `Telefono: ${customer.phone || 'Sin telefono'}`,
     `Ciudad: ${customer.city || 'Sin ciudad'}`,
+    `Tipo de cliente: ${customer.propertyType || 'Sin tipo'}`,
+    `Servicio solicitado: ${customer.serviceNeed || 'Sin servicio'}`,
+    `Urgencia: ${customer.urgency || 'Sin urgencia'}`,
     `Direccion: ${customer.address || 'Sin direccion'}`,
     `Area: ${area ? `${area} m2` : 'Pendiente'}`,
-    `Servicio: ${level}`,
+    `Nivel/servicio calculado: ${level}`,
     `Total estimado: ${money(total)}`,
+    `Comentarios: ${quote.observations || 'Sin comentarios'}`,
     '',
     adminUrl ? `Panel administrador: ${adminUrl}` : 'Abre tu panel privado EMC para revisar la solicitud.'
   ];
@@ -557,16 +642,21 @@ function notifyNewQuote(req, quote) {
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.45;color:#0b1f36">
       <h2 style="margin:0 0 12px">Revisa el panel EMC</h2>
-      <p>Tienes una solicitud nueva de pintura.</p>
+      <p>Tienes una solicitud nueva de servicios.</p>
       <table cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid #dbe5f1">
         <tr><td><strong>Folio</strong></td><td>${escapeHtml(quote.folio)}</td></tr>
         <tr><td><strong>Cliente</strong></td><td>${escapeHtml(customer.name || 'Sin nombre')}</td></tr>
+        <tr><td><strong>Empresa</strong></td><td>${escapeHtml(customer.company || 'Sin empresa')}</td></tr>
         <tr><td><strong>Telefono</strong></td><td>${escapeHtml(customer.phone || 'Sin telefono')}</td></tr>
         <tr><td><strong>Ciudad</strong></td><td>${escapeHtml(customer.city || 'Sin ciudad')}</td></tr>
+        <tr><td><strong>Tipo de cliente</strong></td><td>${escapeHtml(customer.propertyType || 'Sin tipo')}</td></tr>
+        <tr><td><strong>Servicio solicitado</strong></td><td>${escapeHtml(customer.serviceNeed || 'Sin servicio')}</td></tr>
+        <tr><td><strong>Urgencia</strong></td><td>${escapeHtml(customer.urgency || 'Sin urgencia')}</td></tr>
         <tr><td><strong>Direccion</strong></td><td>${escapeHtml(customer.address || 'Sin direccion')}</td></tr>
         <tr><td><strong>Area</strong></td><td>${escapeHtml(area ? `${area} m2` : 'Pendiente')}</td></tr>
-        <tr><td><strong>Servicio</strong></td><td>${escapeHtml(level)}</td></tr>
+        <tr><td><strong>Nivel/servicio calculado</strong></td><td>${escapeHtml(level)}</td></tr>
         <tr><td><strong>Total estimado</strong></td><td>${escapeHtml(money(total))}</td></tr>
+        <tr><td><strong>Comentarios</strong></td><td>${escapeHtml(quote.observations || 'Sin comentarios')}</td></tr>
       </table>
       ${adminUrl ? `<p><a href="${escapeHtml(adminUrl)}" style="display:inline-block;background:#0b1f36;color:#fff;padding:12px 18px;text-decoration:none;border-radius:6px">Abrir panel EMC</a></p>` : '<p>Abre tu panel privado EMC para revisar la solicitud.</p>'}
     </div>
@@ -722,7 +812,8 @@ function serveStatic(req, res) {
   if (pathname === '/') pathname = '/cliente/';
   if (pathname === '/cliente') pathname = '/cliente/';
   if (pathname === '/admin/visitas') pathname = '/admin/visitas/';
-  if (PUBLIC_CLIENT_ONLY && pathname.startsWith('/admin') && !pathname.startsWith('/admin/visitas')) {
+  if (pathname === '/admin/registros') pathname = '/admin/registros/';
+  if (PUBLIC_CLIENT_ONLY && pathname.startsWith('/admin') && !pathname.startsWith('/admin/visitas') && !pathname.startsWith('/admin/registros')) {
     return send(res, 404, 'No encontrado', 'text/plain; charset=utf-8');
   }
   if (pathname === '/admin') pathname = '/admin/';
@@ -797,6 +888,11 @@ async function handleApi(req, res) {
       const deleted = await deleteAnalyticsEvent(eventId);
       if (!deleted) return send(res, 404, { error: 'Visita no encontrada' });
       return send(res, 200, { deleted: true, id: eventId });
+    }
+
+    if (url.pathname === '/api/records/quotes' && req.method === 'GET') {
+      if (!recordsAccessAllowed(req, url)) return send(res, 401, { error: 'Clave incorrecta' });
+      return send(res, 200, recordsSummary(await listQuotes()));
     }
 
     if (!PUBLIC_CLIENT_ONLY && url.pathname === '/api/admin/login' && req.method === 'POST') {

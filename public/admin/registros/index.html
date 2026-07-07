@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registros | EMCAS</title>
+    <link rel="stylesheet" href="/admin/registros/registros.css">
+  </head>
+  <body>
+    <main class="records-shell">
+      <section class="hero">
+        <div>
+          <span>EMCAS</span>
+          <h1>Registros de cotización</h1>
+          <p>Leads capturados desde la landing y el cotizador, listos para seguimiento por WhatsApp, llamada o correo.</p>
+        </div>
+        <button id="refresh" type="button">Actualizar</button>
+      </section>
+
+      <section id="login" class="panel login-panel">
+        <h2>Entrar</h2>
+        <p>Escribe tu clave de EMC para ver los registros.</p>
+        <form id="login-form">
+          <label>Clave
+            <input id="password" type="password" autocomplete="current-password" required>
+          </label>
+          <button type="submit">Ver registros</button>
+        </form>
+        <small>Usa la misma clave del panel EMC, salvo que configures una clave especial.</small>
+      </section>
+
+      <section id="dashboard" class="dashboard" hidden>
+        <div class="cards">
+          <article>
+            <span>Total</span>
+            <strong id="totalQuotes">0</strong>
+            <small>registros</small>
+          </article>
+          <article>
+            <span>Nuevos</span>
+            <strong id="newQuotes">0</strong>
+            <small>por atender</small>
+          </article>
+          <article>
+            <span>Urgentes</span>
+            <strong id="urgentQuotes">0</strong>
+            <small>prioridad alta</small>
+          </article>
+          <article>
+            <span>Hoy</span>
+            <strong id="todayQuotes">0</strong>
+            <small>entraron hoy</small>
+          </article>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Últimas solicitudes</h2>
+            <input id="search" type="search" placeholder="Buscar empresa, municipio, servicio o teléfono">
+          </div>
+          <div id="records" class="records"></div>
+        </section>
+      </section>
+    </main>
+    <script src="/admin/registros/registros.js"></script>
+  </body>
+</html>

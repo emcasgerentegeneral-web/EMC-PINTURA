@@ -7,15 +7,31 @@ create table if not exists public.emc_quotes (
   client_name text,
   client_phone text,
   client_city text,
+  client_company text,
+  client_type text,
+  service_need text,
+  urgency text,
   total numeric not null default 0,
   payload jsonb not null
 );
+
+alter table public.emc_quotes
+  add column if not exists client_company text,
+  add column if not exists client_type text,
+  add column if not exists service_need text,
+  add column if not exists urgency text;
 
 create index if not exists emc_quotes_created_at_idx
   on public.emc_quotes (created_at desc);
 
 create index if not exists emc_quotes_status_idx
   on public.emc_quotes (status);
+
+create index if not exists emc_quotes_service_need_idx
+  on public.emc_quotes (service_need);
+
+create index if not exists emc_quotes_urgency_idx
+  on public.emc_quotes (urgency);
 
 create table if not exists public.emc_collaborators (
   id uuid primary key,
