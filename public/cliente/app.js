@@ -191,16 +191,52 @@ function whatsappUrl(text = 'Hola, quiero una cotización para pintar mi casa co
   return phone ? `https://wa.me/${phone}?text=${message}` : '';
 }
 
+function otherServiceWhatsappText(service) {
+  const c = state.quote.client || {};
+  return [
+    `Hola, quiero cotizar ${service} con EMC Suministros y Servicios.`,
+    `Nombre: ${c.name || '-'}`,
+    `WhatsApp: ${c.phone || '-'}`,
+    `Casa/negocio/empresa: ${c.company || '-'}`,
+    `Municipio: ${c.city || '-'}`,
+    `Zona: ${c.address || '-'}`,
+    'Descripción:'
+  ].join('\n');
+}
+
+function serviceShortcutGrid() {
+  const services = [
+    'Mantenimiento general',
+    'Mantenimiento eléctrico',
+    'Herrería',
+    'Suministros'
+  ];
+  return `
+    <div class="service-shortcuts">
+      <div class="paint-selected">
+        <strong>Pintura</strong>
+        <span>Este sí se calcula aquí.</span>
+      </div>
+      ${services.map(service => `
+        <a class="service-shortcut" href="${whatsappUrl(otherServiceWhatsappText(service))}" target="_blank" rel="noopener" data-other-service="${service}">
+          <strong>${service}</strong>
+          <span>Atención directa por WhatsApp</span>
+        </a>
+      `).join('')}
+    </div>
+  `;
+}
+
 function leadWhatsappText(calc = calculate(), savedQuote = null) {
   const q = savedQuote || state.quote;
   const client = q.client || {};
   const project = q.project || {};
   const folio = savedQuote?.folio ? `\nFolio: ${savedQuote.folio}` : '';
   return [
-    'Hola, quiero una cotización con EMCAS.',
+    'Hola, quiero una cotización con EMC Suministros y Servicios.',
     folio,
     `Nombre: ${client.name || '-'}`,
-    `Empresa: ${client.company || '-'}`,
+    `Casa/negocio/empresa: ${client.company || '-'}`,
     `WhatsApp: ${client.phone || '-'}`,
     `Municipio: ${client.city || '-'}`,
     `Tipo de cliente: ${client.propertyType || '-'}`,
@@ -528,9 +564,9 @@ function home() {
     <section class="home">
       <div class="home-card">
         <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
-        <p class="division">EMCAS en Villahermosa, Centro y municipios cercanos</p>
+        <p class="division">EMC Suministros y Servicios en Villahermosa, Centro y municipios cercanos</p>
         <h1>Cotiza pintura, mantenimiento eléctrico, herrería o suministros.</h1>
-        <p class="home-tagline">Deja tus datos, calcula un estimado inicial y EMCAS te confirma por WhatsApp.</p>
+        <p class="home-tagline">Deja tus datos, calcula un estimado inicial y EMC te confirma por WhatsApp.</p>
         <div class="benefits">
           <span>Gratis</span>
           <span>Rápido</span>
@@ -543,7 +579,7 @@ function home() {
             <small>Gratis y sin compromiso</small>
           </button>
         </div>
-        ${whatsappUrl('Hola, quiero cotizar un servicio con EMCAS.') ? `<a class="home-whatsapp-link" href="${whatsappUrl('Hola, quiero cotizar un servicio con EMCAS.')}" target="_blank" rel="noopener" aria-label="Presiona aquí si prefieres atención por WhatsApp"><strong>Presiona aquí si prefieres atención por WhatsApp</strong><span aria-hidden="true">WhatsApp</span></a>` : ''}
+        ${whatsappUrl('Hola, quiero cotizar un servicio con EMC Suministros y Servicios.') ? `<a class="home-whatsapp-link" href="${whatsappUrl('Hola, quiero cotizar un servicio con EMC Suministros y Servicios.')}" target="_blank" rel="noopener" aria-label="Presiona aquí si prefieres atención por WhatsApp"><strong>Presiona aquí si prefieres atención por WhatsApp</strong><span aria-hidden="true">WhatsApp</span></a>` : ''}
       </div>
     </section>
     <section class="seo-strip" aria-label="Servicios de pintura">
@@ -700,17 +736,21 @@ function stepClient() {
     <div class="card">
       ${workVisual('/assets/emc-uniforme-interior.png', 'Servicio profesional EMC', 'Pintores con playera azul, logo amarillo y gorra trabajando con protección y control de calidad.')}
       <h2>Primero tus datos</h2>
-      <p class="muted">Con esto EMCAS puede mandarte la cotización y preguntarte lo que falte.</p>
+      <p class="muted">Con esto EMC puede mandarte la cotización y preguntarte lo que falte. Sirve para casa, local, negocio o empresa.</p>
       <div class="form-grid">
         ${input('client.name', 'Tu nombre', 'text', 'required autocomplete="name"')}
-        ${input('client.company', 'Empresa o negocio', 'text', 'autocomplete="organization" placeholder="Ej. restaurante, clínica, escuela, local..."')}
+        ${input('client.company', 'Casa, negocio o empresa (opcional)', 'text', 'autocomplete="organization" placeholder="Ej. casa, local, restaurante, clínica, escuela..."')}
         ${input('client.phone', 'Tu WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
         ${input('client.email', 'Correo si tienes', 'email')}
         ${input('client.address', 'Colonia o zona', 'text')}
         ${select('client.city', 'Ciudad o municipio', ['Villahermosa / Centro', 'Cunduacán', 'Jalpa de Méndez', 'Nacajuca', 'Otro'])}
         ${select('client.propertyType', 'Qué es', ['Casa', 'Oficina', 'Local', 'Restaurante', 'Clínica', 'Bodega', 'Escuela', 'Edificio', 'Otro'])}
-        ${select('client.serviceNeed', 'Servicio principal', ['Pintura', 'Mantenimiento general', 'Mantenimiento eléctrico', 'Herrería', 'Suministros', 'Varios'])}
         ${select('client.urgency', 'Cuándo lo necesitas', ['Urgente', 'Esta semana', 'Este mes', 'Estoy comparando precios'])}
+      </div>
+      <div class="service-router">
+        <h3>Tipo de servicio</h3>
+        <p>El cálculo automático de esta página es solo para pintura. Para otro trabajo, toca el servicio y te atiendo por WhatsApp.</p>
+        ${serviceShortcutGrid()}
       </div>
       ${navActions()}
     </div>
@@ -1324,7 +1364,7 @@ function summary(calc) {
     <div class="quote-layout">
       <div class="quote-section">
         <h3>Datos del proyecto</h3>
-        <div class="summary-line"><span>Empresa</span><strong>${q.client.company || 'Pendiente'}</strong></div>
+        <div class="summary-line"><span>Casa/negocio/empresa</span><strong>${q.client.company || 'Pendiente'}</strong></div>
         <div class="summary-line"><span>Teléfono</span><strong>${q.client.phone || 'Pendiente'}</strong></div>
         <div class="summary-line"><span>Tipo de cliente</span><strong>${q.client.propertyType || 'Pendiente'}</strong></div>
         <div class="summary-line"><span>Servicio solicitado</span><strong>${q.client.serviceNeed || 'Pintura'}</strong></div>
@@ -1721,7 +1761,7 @@ function success() {
         <div class="success-mark">✓</div>
         <h2>Recibimos tu solicitud</h2>
         <p>Folio: <strong>${quote.folio}</strong></p>
-        <p class="muted">EMCAS revisará tus datos, fotos y condiciones capturadas para confirmar alcance y agenda.</p>
+        <p class="muted">EMC revisará tus datos, fotos y condiciones capturadas para confirmar alcance y agenda.</p>
         <div class="success-summary">
           <span>Total preliminar</span>
           <strong>${money(quote.calculation?.total)}</strong>
@@ -1832,7 +1872,7 @@ function quoteShareText() {
     `Cotización EMC Pintura`,
     `Folio: ${q.folio}`,
     `Cliente: ${q.client?.name || '-'}`,
-    `Empresa: ${q.client?.company || '-'}`,
+    `Casa/negocio/empresa: ${q.client?.company || '-'}`,
     `WhatsApp: ${q.client?.phone || '-'}`,
     `Municipio: ${q.client?.city || '-'}`,
     `Tipo: ${q.client?.propertyType || '-'}`,

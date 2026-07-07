@@ -615,7 +615,7 @@ function notifyNewQuote(req, quote) {
   const customer = quote.client || quote.customer || {};
   const project = quote.project || {};
   const calculation = quote.calculation || {};
-  const subject = `EMCAS: nueva solicitud ${quote.folio}`;
+  const subject = `EMC Suministros y Servicios: nueva solicitud ${quote.folio}`;
   const total = calculation.totalWithIva ?? calculation.finalTotal ?? calculation.total ?? 0;
   const level = customer.serviceNeed || calculation.levelLabel || calculation.level || project.selectedLevel || 'Pendiente';
   const area = calculation.area ?? project.squareMeters ?? project.totalSquareMeters ?? '';
@@ -624,7 +624,7 @@ function notifyNewQuote(req, quote) {
     '',
     `Folio: ${quote.folio}`,
     `Cliente: ${customer.name || 'Sin nombre'}`,
-    `Empresa: ${customer.company || 'Sin empresa'}`,
+    `Casa/negocio/empresa: ${customer.company || 'Sin dato'}`,
     `Telefono: ${customer.phone || 'Sin telefono'}`,
     `Ciudad: ${customer.city || 'Sin ciudad'}`,
     `Tipo de cliente: ${customer.propertyType || 'Sin tipo'}`,
@@ -646,7 +646,7 @@ function notifyNewQuote(req, quote) {
       <table cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid #dbe5f1">
         <tr><td><strong>Folio</strong></td><td>${escapeHtml(quote.folio)}</td></tr>
         <tr><td><strong>Cliente</strong></td><td>${escapeHtml(customer.name || 'Sin nombre')}</td></tr>
-        <tr><td><strong>Empresa</strong></td><td>${escapeHtml(customer.company || 'Sin empresa')}</td></tr>
+        <tr><td><strong>Casa/negocio/empresa</strong></td><td>${escapeHtml(customer.company || 'Sin dato')}</td></tr>
         <tr><td><strong>Telefono</strong></td><td>${escapeHtml(customer.phone || 'Sin telefono')}</td></tr>
         <tr><td><strong>Ciudad</strong></td><td>${escapeHtml(customer.city || 'Sin ciudad')}</td></tr>
         <tr><td><strong>Tipo de cliente</strong></td><td>${escapeHtml(customer.propertyType || 'Sin tipo')}</td></tr>
