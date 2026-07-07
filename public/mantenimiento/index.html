@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EMCAS | Mantenimiento, Pintura, Eléctrico, Herrería y Suministros en Tabasco</title>
+  <meta name="description" content="Mantenimiento general, pintura, mantenimiento eléctrico, herrería y suministros para empresas, clínicas, escuelas, restaurantes, bodegas y locales en Tabasco.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="EMCAS Suministros y Servicios">
+  <meta name="keywords" content="mantenimiento Villahermosa, pintura Villahermosa, mantenimiento eléctrico Villahermosa, herrería Villahermosa, suministros Tabasco, mantenimiento Cunduacán, mantenimiento Jalpa de Méndez, mantenimiento Nacajuca">
+  <meta property="og:title" content="EMCAS | Mantenimiento, Pintura, Eléctrico, Herrería y Suministros en Tabasco">
+  <meta property="og:description" content="Servicios para clínicas, escuelas, restaurantes, bodegas, plazas y locales comerciales en Villahermosa, Cunduacán, Jalpa de Méndez y Nacajuca.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://emc-pintura.onrender.com/mantenimiento/">
+  <meta property="og:image" content="assets/hero-mantenimiento-emcas.png">
+  <link rel="canonical" href="https://emc-pintura.onrender.com/mantenimiento/">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "EMCAS Suministros y Servicios",
+    "description": "Mantenimiento general, pintura, mantenimiento eléctrico, herrería y suministros para empresas en Tabasco.",
+    "email": "emcas.gerentegeneral@gmail.com",
+    "areaServed": [
+      { "@type": "City", "name": "Villahermosa" },
+      { "@type": "City", "name": "Cunduacán" },
+      { "@type": "City", "name": "Jalpa de Méndez" },
+      { "@type": "City", "name": "Nacajuca" }
+    ],
+    "serviceType": [
+      "Mantenimiento general",
+      "Pintura",
+      "Mantenimiento eléctrico",
+      "Herrería",
+      "Suministros"
+    ],
+    "url": "https://emc-pintura.onrender.com/mantenimiento/"
+  }
+  </script>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #607080;
+      --line: #d8e0e8;
+      --soft: #f4f7fa;
+      --blue: #0b4f8a;
+      --blue2: #07375f;
+      --teal: #0f766e;
+      --amber: #b45309;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      background: var(--white);
+    }
+
+    a { color: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px clamp(18px, 4vw, 56px);
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .button.primary {
+      background: var(--teal);
+      color: var(--white);
+      border-color: var(--teal);
+    }
+
+    .button.dark {
+      background: var(--blue2);
+      color: var(--white);
+      border-color: var(--blue2);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 78vh;
+      display: grid;
+      align-items: center;
+      padding: 72px clamp(18px, 5vw, 72px);
+      overflow: hidden;
+      color: var(--white);
+      isolation: isolate;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(90deg, rgba(5, 18, 30, 0.88) 0%, rgba(5, 18, 30, 0.72) 40%, rgba(5, 18, 30, 0.28) 78%),
+        url("assets/hero-mantenimiento-emcas.png");
+      background-size: cover;
+      background-position: center;
+      z-index: -2;
+    }
+
+    .hero-content {
+      max-width: 760px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 6px;
+      color: #e8f7ff;
+      font-size: 13px;
+      font-weight: 800;
+      background: rgba(255,255,255,.08);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 740px;
+      font-size: clamp(36px, 6vw, 70px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 650px;
+      color: #e4edf5;
+      font-size: clamp(17px, 2vw, 22px);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .trust {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .trust span {
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.22);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    main section {
+      padding: 54px clamp(18px, 5vw, 72px);
+    }
+
+    .section-head {
+      display: grid;
+      gap: 8px;
+      max-width: 800px;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 40px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .section-head p,
+    .muted {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .service,
+    .client,
+    .zone {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 18px;
+      min-height: 148px;
+    }
+
+    .service h3,
+    .client h3,
+    .zone h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .service p,
+    .client p,
+    .zone p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .band {
+      background: var(--soft);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: var(--white);
+      font-weight: 800;
+    }
+
+    .step strong { display: block; margin-bottom: 4px; }
+    .step p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .contact {
+      background: var(--blue2);
+      color: var(--white);
+    }
+
+    .contact .section-head p { color: #dbe8f2; }
+
+    .contact-panel {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+      padding: 20px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.24);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 6px;
+      background: rgba(255,255,255,.96);
+      color: var(--ink);
+      padding: 11px 12px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .contact-info {
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.24);
+    }
+
+    .contact-info p { margin: 0; color: #e6eef6; }
+
+    footer {
+      padding: 22px clamp(18px, 5vw, 72px);
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    @media (max-width: 1000px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split,
+      .contact-panel { grid-template-columns: 1fr; }
+      .hero { min-height: 72vh; }
+    }
+
+    @media (max-width: 620px) {
+      .topbar { align-items: flex-start; }
+      .nav { display: none; }
+      .grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 54px; }
+      .actions .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span>EMCAS</span>
+      <small>Suministros y Servicios</small>
+    </div>
+    <nav class="nav" aria-label="Navegación principal">
+      <a href="#servicios">Servicios</a>
+      <a href="#clientes">Clientes</a>
+      <a href="#contacto">Contacto</a>
+      <a class="button primary" href="mailto:emcas.gerentegeneral@gmail.com?subject=Solicitud%20de%20cotizaci%C3%B3n%20EMCAS">Cotizar</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <span class="eyebrow">Atención a empresas en Tabasco</span>
+      <h1>Mantenimiento, pintura, eléctrico, herrería y suministros.</h1>
+      <p>Apoyo preventivo y correctivo para clínicas, escuelas, restaurantes, bodegas, plazas y locales comerciales en Villahermosa, Cunduacán, Jalpa de Méndez y Nacajuca.</p>
+      <div class="actions">
+        <a class="button primary" href="mailto:emcas.gerentegeneral@gmail.com?subject=Solicitud%20de%20cotizaci%C3%B3n%20EMCAS&body=Hola%2C%20quiero%20cotizar%20un%20servicio.%0A%0AEmpresa%3A%0AMunicipio%3A%0AServicio%3A%0ATel%C3%A9fono%3A%0ADescripci%C3%B3n%3A">Solicitar cotización</a>
+        <a class="button dark" href="https://wa.me/529932869691?text=Hola%2C%20quiero%20cotizar%20un%20servicio%20con%20EMCAS" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+      <div class="trust" aria-label="Servicios principales">
+        <span>Respuesta rápida</span>
+        <span>Empresas y comercios</span>
+        <span>Preventivo y correctivo</span>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section id="servicios">
+      <div class="section-head">
+        <h2>Servicios para instalaciones físicas</h2>
+        <p>Atendemos trabajos puntuales, mantenimiento programado y necesidades urgentes de operación.</p>
+      </div>
+      <div class="grid">
+        <article class="service">
+          <h3>Mantenimiento general</h3>
+          <p>Reparaciones, revisión de pendientes, trabajos preventivos y correctivos.</p>
+        </article>
+        <article class="service">
+          <h3>Pintura</h3>
+          <p>Aulas, oficinas, locales, áreas comunes, fachadas y mantenimiento estético.</p>
+        </article>
+        <article class="service">
+          <h3>Mantenimiento eléctrico</h3>
+          <p>Revisión, corrección, luminarias, tableros, contactos y apoyo preventivo.</p>
+        </article>
+        <article class="service">
+          <h3>Herrería</h3>
+          <p>Puertas, protecciones, barandales, estructuras ligeras, ajustes y reparaciones.</p>
+        </article>
+        <article class="service">
+          <h3>Suministros</h3>
+          <p>Materiales, refacciones y apoyo para compras operativas o trabajos de campo.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="clientes" class="band">
+      <div class="section-head">
+        <h2>Clientes que atendemos</h2>
+        <p>Priorizamos negocios con operación diaria, instalaciones activas y necesidades recurrentes.</p>
+      </div>
+      <div class="grid">
+        <article class="client">
+          <h3>Clínicas</h3>
+          <p>Mantenimiento preventivo, pintura, electricidad y atención a áreas críticas.</p>
+        </article>
+        <article class="client">
+          <h3>Escuelas</h3>
+          <p>Trabajos programados en aulas, accesos, áreas comunes y equipos básicos.</p>
+        </article>
+        <article class="client">
+          <h3>Restaurantes</h3>
+          <p>Reparaciones y mantenimiento con coordinación para no afectar la operación.</p>
+        </article>
+        <article class="client">
+          <h3>Bodegas</h3>
+          <p>Apoyo industrial, herrería, electricidad, pintura y suministros operativos.</p>
+        </article>
+        <article class="client">
+          <h3>Locales y plazas</h3>
+          <p>Mantenimiento de locales, áreas comunes, accesos y trabajos de respuesta rápida.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="split">
+        <div>
+          <div class="section-head">
+            <h2>Zonas de servicio</h2>
+            <p>Trabajamos en municipios clave de Tabasco y podemos revisar proyectos cercanos según disponibilidad.</p>
+          </div>
+          <div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+            <article class="zone">
+              <h3>Villahermosa</h3>
+              <p>Centro, Tabasco 2000, Atasta, Deportiva, zonas comerciales e industriales.</p>
+            </article>
+            <article class="zone">
+              <h3>Cunduacán</h3>
+              <p>Empresas, comercios, escuelas, bodegas y servicios programados.</p>
+            </article>
+            <article class="zone">
+              <h3>Jalpa de Méndez</h3>
+              <p>Mantenimiento para negocios, instituciones y comercios con instalaciones físicas.</p>
+            </article>
+            <article class="zone">
+              <h3>Nacajuca</h3>
+              <p>Atención a empresas, locales, restaurantes, escuelas y bodegas.</p>
+            </article>
+          </div>
+        </div>
+        <div class="steps">
+          <div class="section-head">
+            <h2>Cómo trabajamos</h2>
+            <p>Proceso simple para revisar, cotizar y ejecutar con claridad.</p>
+          </div>
+          <div class="step">
+            <span class="num">1</span>
+            <div><strong>Revisión del requerimiento</strong><p>Recibimos fotos, ubicación o descripción del problema.</p></div>
+          </div>
+          <div class="step">
+            <span class="num">2</span>
+            <div><strong>Cotización clara</strong><p>Definimos alcance, materiales, tiempos y próximos pasos.</p></div>
+          </div>
+          <div class="step">
+            <span class="num">3</span>
+            <div><strong>Ejecución y seguimiento</strong><p>Coordinamos el trabajo y dejamos registro para futuras necesidades.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" class="contact">
+      <div class="section-head">
+        <h2>Solicita una revisión o cotización</h2>
+        <p>Cuéntanos qué necesitas y en qué municipio se encuentra el trabajo.</p>
+      </div>
+      <div class="contact-panel">
+        <form action="mailto:emcas.gerentegeneral@gmail.com" method="post" enctype="text/plain">
+          <label>
+            Nombre o empresa
+            <input name="Nombre o empresa" autocomplete="organization" required>
+          </label>
+          <label>
+            Teléfono
+            <input name="Telefono" autocomplete="tel" required>
+          </label>
+          <label>
+            Municipio
+            <select name="Municipio" required>
+              <option value="">Seleccionar</option>
+              <option>Villahermosa / Centro</option>
+              <option>Cunduacán</option>
+              <option>Jalpa de Méndez</option>
+              <option>Nacajuca</option>
+              <option>Otro</option>
+            </select>
+          </label>
+          <label>
+            Servicio
+            <select name="Servicio" required>
+              <option value="">Seleccionar</option>
+              <option>Mantenimiento general</option>
+              <option>Pintura</option>
+              <option>Mantenimiento eléctrico</option>
+              <option>Herrería</option>
+              <option>Suministros</option>
+              <option>Varios</option>
+            </select>
+          </label>
+          <label>
+            Descripción
+            <textarea name="Descripcion" placeholder="Describe el trabajo, urgencia, ubicación y si tienes fotos disponibles."></textarea>
+          </label>
+          <button class="button primary" type="submit">Enviar solicitud</button>
+        </form>
+        <aside class="contact-info">
+          <h3>Contacto directo</h3>
+          <p><strong>Email:</strong> emcas.gerentegeneral@gmail.com</p>
+          <p><strong>WhatsApp:</strong> 9932869691</p>
+          <p><strong>Horario sugerido:</strong> lunes a viernes, atención comercial.</p>
+          <p class="muted" style="color:#cfe0ef;">Para Google Ads y Google Business Profile, esta landing sirve como destino de cotizaciones y presentación formal.</p>
+          <a class="button primary" href="mailto:emcas.gerentegeneral@gmail.com?subject=Solicitud%20de%20cotizaci%C3%B3n%20EMCAS">Escribir por email</a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    EMCAS Suministros y Servicios. Mantenimiento, pintura, mantenimiento eléctrico, herrería y suministros en Tabasco.
+  </footer>
+</body>
+</html>
