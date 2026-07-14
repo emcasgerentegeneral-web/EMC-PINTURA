@@ -332,37 +332,13 @@
       align-items: stretch;
     }
 
-    form {
+    .contact-actions {
       display: grid;
-      gap: 12px;
+      gap: 14px;
       padding: 20px;
       border-radius: 8px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.24);
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    input,
-    textarea,
-    select {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,.24);
-      border-radius: 6px;
-      background: rgba(255,255,255,.96);
-      color: var(--ink);
-      padding: 11px 12px;
-      font: inherit;
-    }
-
-    textarea {
-      min-height: 110px;
-      resize: vertical;
     }
 
     .contact-info {
@@ -375,6 +351,22 @@
     }
 
     .contact-info p { margin: 0; color: #e6eef6; }
+
+    .contact-actions h3,
+    .contact-info h3 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .contact-actions p {
+      margin: 0;
+      color: #dbe8f2;
+    }
+
+    .contact-actions .button {
+      min-height: 52px;
+      font-size: 16px;
+    }
 
     footer {
       padding: 22px clamp(18px, 5vw, 72px);
@@ -557,52 +549,19 @@
         <p>Cuéntanos qué necesitas y en qué municipio se encuentra el trabajo.</p>
       </div>
       <div class="contact-panel">
-        <form action="mailto:emcas.gerentegeneral@gmail.com" method="post" enctype="text/plain">
-          <label>
-            Nombre, casa o negocio
-            <input name="Nombre, casa o negocio" autocomplete="organization" required>
-          </label>
-          <label>
-            Teléfono
-            <input name="Telefono" autocomplete="tel" required>
-          </label>
-          <label>
-            Municipio
-            <select name="Municipio" required>
-              <option value="">Seleccionar</option>
-              <option>Villahermosa / Centro</option>
-              <option>Cunduacán</option>
-              <option>Jalpa de Méndez</option>
-              <option>Nacajuca</option>
-              <option>Otro</option>
-            </select>
-          </label>
-          <label>
-            Servicio
-            <select name="Servicio" required>
-              <option value="">Seleccionar</option>
-              <option>Mantenimiento general</option>
-              <option>Pintura</option>
-              <option>Mantenimiento eléctrico</option>
-              <option>Herrería</option>
-              <option>Suministros</option>
-              <option>Varios</option>
-            </select>
-          </label>
-          <label>
-            Descripción
-            <textarea name="Descripcion" placeholder="Describe el trabajo, urgencia, ubicación y si tienes fotos disponibles."></textarea>
-          </label>
-          <button class="button primary" type="submit">Enviar solicitud</button>
-        </form>
+        <div class="contact-actions">
+          <h3>Elige cómo quieres cotizar</h3>
+          <p>Para pintura usa el cotizador. Para mantenimiento, eléctrico, herrería o suministros, escríbenos directo por WhatsApp.</p>
+          <a class="button primary" href="/cliente/">Cotizar pintura</a>
+          <a class="button dark" href="https://wa.me/529932869691?text=Hola%2C%20quiero%20cotizar%20un%20servicio%20con%20EMC%20Suministros%20y%20Servicios.%20Necesito%3A" target="_blank" rel="noopener">Cotizar otros servicios por WhatsApp</a>
+        </div>
         <aside class="contact-info">
           <h3>Contacto directo</h3>
-          <p><strong>Email:</strong> emcas.gerentegeneral@gmail.com</p>
           <p><strong>WhatsApp:</strong> 9932869691</p>
           <p><strong>Horario sugerido:</strong> lunes a viernes, atención comercial.</p>
           <p class="muted" style="color:#cfe0ef;">Para Google Ads y Google Business Profile, esta landing sirve como destino de cotizaciones y presentación formal.</p>
           <a class="button primary" href="/cliente/">Cotizar pintura</a>
-          <a class="button dark" href="mailto:emcas.gerentegeneral@gmail.com?subject=Solicitud%20de%20cotizaci%C3%B3n%20EMC%20Suministros%20y%20Servicios">Escribir por email</a>
+          <a class="button dark" href="https://wa.me/529932869691?text=Hola%2C%20quiero%20informaci%C3%B3n%20de%20EMC%20Suministros%20y%20Servicios" target="_blank" rel="noopener">Abrir WhatsApp</a>
         </aside>
       </div>
     </section>
