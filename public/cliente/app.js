@@ -1,4 +1,9 @@
 const app = document.querySelector('#app');
+const runtime = window.EMC_RUNTIME || {};
+
+function apiUrl(path) {
+  return `${String(runtime.apiBaseUrl || '').replace(/\/$/, '')}${path}`;
+}
 
 function initialQuote() {
   return {
@@ -8,10 +13,11 @@ function initialQuote() {
       phone: '',
       email: '',
       address: '',
-      city: '',
+      city: 'Villahermosa / Centro',
       propertyType: 'Casa',
       serviceNeed: 'Pintura',
-      urgency: 'Esta semana'
+      urgency: 'Esta semana',
+      consent: false
     },
     project: {
       squareMeters: '',
@@ -21,7 +27,12 @@ function initialQuote() {
       heightMeters: '',
       applicationType: 'Interior'
     },
-    diagnostic: {},
+    diagnostic: {
+      surfaceCondition: 'Buen estado',
+      moisture: 'No visible',
+      colorChange: 'Similar',
+      accessDifficulty: 'Normal'
+    },
     photos: [],
     service: {
       selectedLevel: '',
@@ -74,13 +85,15 @@ function track(type, detail = {}) {
     step: state.view === 'quote' ? state.step + 1 : null,
     ...detail
   };
+  if (window.dataLayer) window.dataLayer.push({ event: type, ...payload });
+  if (typeof window.fbq === 'function') window.fbq('trackCustom', type, payload);
   try {
     const body = JSON.stringify(payload);
     if (navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }));
+      navigator.sendBeacon(apiUrl('/api/track'), new Blob([body], { type: 'application/json' }));
       return;
     }
-    fetch('/api/track', {
+    fetch(apiUrl('/api/track'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body,
@@ -92,12 +105,9 @@ function track(type, detail = {}) {
 }
 
 const stepLabels = [
-  'Tus datos',
-  'Qué se pinta',
-  'Fotos',
-  'Precio',
-  'Pintura',
-  'Enviar'
+  'Medidas y condiciones',
+  'Precio y paquete',
+  'Contacto y envío'
 ];
 
 const requiredPhotos = ['Foto general', 'Foto de pared', 'Foto de acceso', 'Foto de detalle'];
@@ -181,8 +191,18 @@ function today() {
   return new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: '2-digit' });
 }
 
+function campaignAttribution() {
+  const params = new URLSearchParams(window.location.search);
+  return ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid']
+    .reduce((result, key) => {
+      const value = params.get(key);
+      if (value) result[key] = value.slice(0, 180);
+      return result;
+    }, {});
+}
+
 function businessWhatsapp() {
-  return String(state.config?.contact?.whatsapp || '').replace(/\D/g, '');
+  return String(state.config?.contact?.whatsapp || runtime.config?.contact?.whatsapp || '529932869691').replace(/\D/g, '');
 }
 
 function whatsappUrl(text = 'Hola, quiero una cotización para pintar mi casa con EMC Pintura.') {
@@ -232,19 +252,19 @@ function leadWhatsappText(calc = calculate(), savedQuote = null) {
   const client = q.client || {};
   const project = q.project || {};
   const folio = savedQuote?.folio ? `\nFolio: ${savedQuote.folio}` : '';
+  const range = calc.preliminaryRange || preliminaryRange(calc.level || q.service?.selectedLevel || 'medio');
   return [
-    'Hola, quiero una cotización con EMC Suministros y Servicios.',
+    `Hola, soy ${client.name || '-'}. Realicé una cotización en EMC Pintura.`,
     folio,
-    `Nombre: ${client.name || '-'}`,
-    `Casa/negocio/empresa: ${client.company || '-'}`,
-    `WhatsApp: ${client.phone || '-'}`,
-    `Municipio: ${client.city || '-'}`,
-    `Tipo de cliente: ${client.propertyType || '-'}`,
-    `Servicio: ${client.serviceNeed || 'Pintura'}`,
-    `Urgencia: ${client.urgency || '-'}`,
-    `Área aproximada: ${project.squareMeters || project.interiorSquareMeters || project.exteriorSquareMeters || '-'} m²`,
-    `Total preliminar: ${money(calc.total)}`,
-    `Comentarios: ${q.observations || '-'}`
+    `Ubicación: ${client.address || '-'}, ${client.city || '-'}`,
+    `Inmueble: ${client.propertyType || '-'}`,
+    `Superficie: ${project.squareMeters || project.interiorSquareMeters || project.exteriorSquareMeters || '-'} m²`,
+    `Servicio: Pintura ${project.applicationType || ''}`,
+    `Condición: ${q.diagnostic?.surfaceCondition || '-'}`,
+    `Paquete: ${levels[calc.level || q.service?.selectedLevel]?.label || '-'}`,
+    `Estimado: ${money(range.minimum)} a ${money(range.maximum)}`,
+    `Comentarios: ${q.observations || '-'}`,
+    'Me interesa confirmar el precio.'
   ].filter(Boolean).join('\n');
 }
 
@@ -294,18 +314,27 @@ function update(path, value) {
 }
 
 async function loadConfig() {
-  const [configResponse, aiStatusResponse] = await Promise.all([
-    fetch('/api/config', { cache: 'no-store' }),
-    fetch('/api/ai-status', { cache: 'no-store' })
-  ]);
-  state.config = await configResponse.json();
-  state.aiStatus = await aiStatusResponse.json();
+  if (runtime.config) {
+    state.config = runtime.config;
+    state.aiStatus = { configured: false, loading: true };
+  } else {
+    const configResponse = await fetch(apiUrl('/api/config'), { cache: 'no-store' });
+    state.config = await configResponse.json();
+    state.aiStatus = { configured: false };
+  }
   if (new URLSearchParams(window.location.search).get('start') === 'quote') {
     startNewQuote();
-    return;
+  } else {
+    render();
+    track('pageview', { detail: 'cliente inicio' });
   }
-  render();
-  track('pageview', { detail: 'cliente inicio' });
+  Promise.all([
+    fetch(apiUrl('/api/config'), { cache: 'no-store' }).then(response => response.ok ? response.json() : null),
+    fetch(apiUrl('/api/ai-status'), { cache: 'no-store' }).then(response => response.ok ? response.json() : null)
+  ]).then(([freshConfig, aiStatus]) => {
+    if (freshConfig) state.config = { ...state.config, ...freshConfig, contact: { ...(state.config.contact || {}), ...(freshConfig.contact || {}) } };
+    if (aiStatus) state.aiStatus = aiStatus;
+  }).catch(() => {});
 }
 
 function highestLevel(a, b) {
@@ -314,6 +343,13 @@ function highestLevel(a, b) {
 
 function minimumLevelByRules() {
   let minimum = 'basico';
+  const diagnostic = state.quote.diagnostic || {};
+  if (diagnostic.surfaceCondition === 'Resanes ligeros' || diagnostic.colorChange === 'Claro a oscuro' || diagnostic.colorChange === 'Oscuro a claro') {
+    minimum = highestLevel(minimum, 'medio');
+  }
+  if (diagnostic.surfaceCondition === 'Resanes fuertes' || diagnostic.moisture === 'Humedad, moho o salitre') {
+    minimum = highestLevel(minimum, 'premium');
+  }
   if (state.photoAnalysis?.minimumLevel) minimum = highestLevel(minimum, state.photoAnalysis.minimumLevel);
   return minimum;
 }
@@ -564,9 +600,9 @@ function home() {
     <section class="home">
       <div class="home-card">
         <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
-        <p class="division">EMC Suministros y Servicios en Villahermosa, Centro y municipios cercanos</p>
-        <h1>Cotiza pintura, mantenimiento eléctrico, herrería o suministros.</h1>
-        <p class="home-tagline">Deja tus datos, calcula un estimado inicial y EMC te confirma por WhatsApp.</p>
+        <p class="division">EMC Pintura · Villahermosa, Centro y municipios cercanos</p>
+        <h1>Calcula cuánto cuesta pintar tu casa o negocio.</h1>
+        <p class="home-tagline">Obtén un precio preliminar según los metros cuadrados y el estado de la superficie. Gratis y sin compromiso.</p>
         <div class="benefits">
           <span>Gratis</span>
           <span>Rápido</span>
@@ -575,17 +611,17 @@ function home() {
         ${homeProcess()}
         <div class="button-stack">
           <button class="btn btn-primary btn-hero" data-action="quote">
-            <strong>Calcular ahora</strong>
-            <small>Gratis y sin compromiso</small>
+            <strong>Calcular mi precio</strong>
+            <small>Ve el estimado antes de dejar tus datos</small>
           </button>
         </div>
-        ${whatsappUrl('Hola, quiero cotizar un servicio con EMC Suministros y Servicios.') ? `<a class="home-whatsapp-link" href="${whatsappUrl('Hola, quiero cotizar un servicio con EMC Suministros y Servicios.')}" target="_blank" rel="noopener" aria-label="Presiona aquí si prefieres atención por WhatsApp"><strong>Presiona aquí si prefieres atención por WhatsApp</strong><span aria-hidden="true">WhatsApp</span></a>` : ''}
+        ${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.') ? `<a class="home-whatsapp-link" href="${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.')}" target="_blank" rel="noopener" aria-label="Prefiero cotizar por WhatsApp"><strong>Prefiero cotizar por WhatsApp</strong><span aria-hidden="true">WhatsApp</span></a>` : ''}
       </div>
     </section>
     <section class="seo-strip" aria-label="Servicios de pintura">
       <div>
-        <strong>Servicios para locales, restaurantes, clínicas, bodegas, escuelas y casas</strong>
-        <span>Pintura, mantenimiento general, mantenimiento eléctrico, herrería y suministros en Villahermosa/Centro, Nacajuca, Jalpa de Méndez y Cunduacán.</span>
+        <strong>Pintura para casas, negocios, oficinas, fachadas y edificios</strong>
+        <span>Atendemos Villahermosa/Centro, Nacajuca, Jalpa de Méndez y Cunduacán. ¿Necesitas mantenimiento, electricidad, herrería o suministros? Solicítalo por WhatsApp.</span>
       </div>
     </section>
   `;
@@ -593,10 +629,9 @@ function home() {
 
 function homeProcess() {
   const steps = [
-    ['1', 'Pon tu WhatsApp.'],
-    ['2', 'Di qué servicio necesitas.'],
-    ['3', 'Sube fotos si tienes.'],
-    ['4', 'Recibe precio y seguimiento.']
+    ['1', 'Indica área y tipo de inmueble.'],
+    ['2', 'Describe el estado sin subir fotografías.'],
+    ['3', 'Compara paquetes, ve tu precio y decide.']
   ];
   return `
     <div class="client-method" aria-label="Método EMC">
@@ -605,7 +640,7 @@ function homeProcess() {
         ${steps.map(([title, text], index) => `
           <div class="client-method-card">
             <small>${title}</small>
-          <strong>${index === 0 ? 'Datos' : index === 1 ? 'Fotos' : index === 2 ? 'Precio' : 'Contacto'}</strong>
+          <strong>${index === 0 ? 'Medidas' : index === 1 ? 'Condiciones' : 'Precio'}</strong>
             <em>${text}</em>
           </div>
         `).join('')}
@@ -633,23 +668,19 @@ function topbar(subtitle) {
 }
 
 function progress() {
-  return `<div class="progress six">${[0, 1, 2, 3, 4, 5].map(i => `<span class="${i <= state.step ? 'active' : ''}"></span>`).join('')}</div>`;
+  return `<div class="progress three">${[0, 1, 2].map(i => `<span class="${i <= state.step ? 'active' : ''}"></span>`).join('')}</div>`;
 }
 
 function clientPhaseIndex() {
-  if (state.step <= 1) return 0;
-  if (state.step === 2) return 1;
-  if (state.step <= 4) return 2;
-  return 3;
+  return state.step;
 }
 
 function clientControlPath() {
   const current = clientPhaseIndex();
   const phases = [
-    ['Inicio', 'Datos básicos'],
-    ['Apoyo', 'Fotos si puedes'],
-    ['Precio', 'Estimado inicial'],
-    ['Confirmar', 'EMC te contacta']
+    ['Medidas', 'Proyecto y condiciones'],
+    ['Precio', 'Paquete y estimado'],
+    ['Contacto', 'Guardar y enviar']
   ];
   return `
     <div class="client-path" aria-label="Proceso EMC">
@@ -682,9 +713,9 @@ function select(path, label, options) {
 
 function quoteStep() {
   const calc = calculate();
-  const steps = [stepClient, stepProject, stepPhotos, stepRecommendation, stepSupply, stepSummary];
+  const steps = [stepProjectConditions, stepPricePackages, stepContactAndSend];
   return `
-    ${topbar(`Paso ${state.step + 1} de 6`)}
+    ${topbar(`Paso ${state.step + 1} de 3`)}
     <section class="screen">
       ${progress()}
       ${clientControlPath()}
@@ -697,14 +728,14 @@ function quoteStep() {
 }
 
 function stepContext(calc) {
-  const title = state.step === 0 ? 'Empezamos fácil' : state.step < 5 ? 'Vamos paso a paso' : 'Último paso';
+  const title = state.step === 0 ? 'Cuéntanos sobre el espacio' : state.step === 1 ? 'Tu estimado ya está listo' : 'Recibe tu cotización';
   return `
     <div class="step-context">
       <div>
         <span>${stepLabels[state.step]}</span>
         <strong>${title}</strong>
       </div>
-      ${state.step >= 5 ? `
+      ${state.step >= 1 ? `
         <div>
           <span>Total estimado</span>
           <strong>${money(calc.total)}</strong>
@@ -728,6 +759,138 @@ function workVisual(src, title, caption) {
         <span>${caption}</span>
       </figcaption>
     </figure>
+  `;
+}
+
+function preliminaryRange(level = scoreDiagnostic()) {
+  const m2 = projectSquareMeters();
+  const rate = Number(state.config.labor?.[level] || levels[level].price);
+  const base = m2 * rate;
+  const accessPct = autoAccess().scaffold ? Number(state.config.adjustments.singleAdditionalPct || 15) : 0;
+  const minimum = Math.round(base * (1 + accessPct / 100));
+  const maximum = Math.round(minimum * 1.12);
+  return { minimum, maximum, rate };
+}
+
+function stepProjectConditions() {
+  const p = state.quote.project;
+  const d = state.quote.diagnostic;
+  return `
+    <div class="card visual-card project-visual">
+      ${workVisual('/assets/emc-uniforme-exterior.png', 'Calcula con medidas aproximadas', 'No necesitas tener un plano. EMC confirmará las medidas antes de iniciar el trabajo.')}
+      <h2>¿Qué quieres pintar?</h2>
+      <p class="muted">Indica lo que sabes. No necesitas fotografías para obtener el precio preliminar.</p>
+      <div class="form-grid">
+        ${select('client.propertyType', 'Tipo de inmueble', ['Casa', 'Oficina', 'Local', 'Restaurante', 'Clínica', 'Bodega', 'Escuela', 'Edificio', 'Otro'])}
+        ${select('project.applicationType', 'Área que se pintará', ['Interior', 'Exterior', 'Interior y exterior'])}
+        ${p.applicationType === 'Interior' ? input('project.interiorSquareMeters', 'm² aproximados interiores', 'number', 'min="1" inputmode="decimal" required') : ''}
+        ${p.applicationType === 'Exterior' ? input('project.exteriorSquareMeters', 'm² aproximados exteriores', 'number', 'min="1" inputmode="decimal" required') : ''}
+        ${p.applicationType === 'Interior y exterior' ? `
+          ${input('project.interiorSquareMeters', 'm² interiores', 'number', 'min="1" inputmode="decimal" required')}
+          ${input('project.exteriorSquareMeters', 'm² exteriores', 'number', 'min="1" inputmode="decimal" required')}
+        ` : ''}
+        ${input('project.floors', 'Número de plantas', 'number', 'min="1" max="20" inputmode="numeric" placeholder="Ej. 1"')}
+        ${input('project.heightMeters', 'Altura aproximada en metros (opcional)', 'number', 'min="1" max="15" step="0.1" inputmode="decimal"')}
+        ${select('diagnostic.surfaceCondition', 'Estado de la superficie', ['Buen estado', 'Resanes ligeros', 'Resanes fuertes'])}
+        ${select('diagnostic.moisture', 'Humedad, moho o salitre', ['No visible', 'Humedad, moho o salitre', 'No estoy seguro'])}
+        ${select('diagnostic.colorChange', 'Cambio de color', ['Similar', 'Claro a oscuro', 'Oscuro a claro'])}
+        ${select('diagnostic.accessDifficulty', 'Acceso al área', ['Normal', 'Escalera', 'Andamio o acceso especial', 'No estoy seguro'])}
+      </div>
+      ${navActions('Ver mi precio')}
+    </div>
+  `;
+}
+
+function packageCard(key, recommendedLevel) {
+  const level = levels[key];
+  const range = preliminaryRange(key);
+  const selected = state.quote.service.selectedLevel === key;
+  return `
+    <article class="service-choice-card package-card ${key === recommendedLevel ? 'recommended' : ''} ${selected ? 'selected' : ''}">
+      <span>${key === recommendedLevel ? 'Recomendado para tu proyecto' : key === 'medio' ? 'Más solicitado' : 'Opción disponible'}</span>
+      <h3>${level.label}</h3>
+      <strong>${money(range.rate)}/m²</strong>
+      <p>${level.short}</p>
+      <div class="package-total">${money(range.minimum)} a ${money(range.maximum)}</div>
+      <small>${level.coats} manos · ${level.scope}</small>
+      <ul class="clean-list compact">${level.includes.slice(0, 6).map(item => `<li>${item}</li>`).join('')}</ul>
+      <button class="btn ${selected ? 'btn-dark' : 'btn-primary'}" data-select-package="${key}" type="button">${selected ? 'Paquete elegido' : `Elegir ${level.label}`}</button>
+    </article>
+  `;
+}
+
+function stepPricePackages(calc) {
+  const recommended = calc.recommendedLevel;
+  const range = preliminaryRange(state.quote.service.selectedLevel || recommended);
+  return `
+    <div class="card price-step-card">
+      <div class="quote-total-hero preliminary-price">
+        <span>Precio preliminar de tu proyecto</span>
+        <strong>${money(range.minimum)} a ${money(range.maximum)}</strong>
+        <small>${projectSquareMeters()} m² · ${state.quote.project.applicationType} · mano de obra y preparación; pintura cotizada por separado.</small>
+      </div>
+      <h2>Compara y elige el nivel de servicio</h2>
+      <p class="muted">El rango puede ajustarse después de revisar fotografías o realizar una visita. No has tenido que dejar tus datos para verlo.</p>
+      <div class="service-choice-grid package-comparison">
+        ${['basico', 'medio', 'premium'].map(key => packageCard(key, recommended)).join('')}
+      </div>
+      <div class="trust-grid" aria-label="Compromisos EMC">
+        <span>Presupuesto por escrito</span><span>Protección de pisos y mobiliario</span><span>Limpieza al finalizar</span><span>Factura disponible</span><span>Seguimiento por WhatsApp</span><span>Garantía especificada en la cotización</span>
+      </div>
+      <div class="notice">El precio mostrado no incluye pintura ni daños ocultos. EMC confirmará el alcance antes de iniciar y nunca modificará el precio sin explicarlo.</div>
+      ${navActions('Continuar con mis datos')}
+    </div>
+  `;
+}
+
+function stepContactAndSend(calc) {
+  const range = preliminaryRange(calc.level);
+  return `
+    <div class="quote-document contact-step">
+      <div class="quote-total-hero">
+        <span>Tu proyecto podría costar</span>
+        <strong>${money(range.minimum)} a ${money(range.maximum)}</strong>
+        <small>${projectSquareMeters()} m² · paquete ${levels[calc.level].label} · ${calc.coats} manos.</small>
+      </div>
+      <div class="quote-section">
+        <h2>¿Dónde te enviamos la cotización?</h2>
+        <p class="muted">Sólo necesitamos estos datos para guardar tu folio y continuar por WhatsApp.</p>
+        <div class="form-grid">
+          ${input('client.name', 'Nombre', 'text', 'required autocomplete="name"')}
+          ${input('client.phone', 'WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
+          ${input('client.address', 'Colonia o zona', 'text', 'required autocomplete="address-level3"')}
+          ${select('client.city', 'Ciudad o municipio', ['Villahermosa / Centro', 'Cunduacán', 'Jalpa de Méndez', 'Nacajuca', 'Otro'])}
+          ${input('client.email', 'Correo (opcional)', 'email', 'autocomplete="email"')}
+          ${input('client.company', 'Empresa o negocio (opcional)', 'text', 'autocomplete="organization"')}
+          ${select('client.urgency', 'Cuándo lo necesitas', ['Urgente', 'Esta semana', 'Este mes', 'Estoy comparando precios'])}
+          <label>Factura
+            <select data-path="service.invoice">
+              <option value="false" ${state.quote.service.invoice ? '' : 'selected'}>Sin factura</option>
+              <option value="true" ${state.quote.service.invoice ? 'selected' : ''}>Con factura + IVA</option>
+            </select>
+          </label>
+        </div>
+        <label>Comentarios o solicitud de visita
+          <textarea data-path="observations" placeholder="Ej. Me interesa una visita para confirmar medidas">${state.quote.observations || ''}</textarea>
+        </label>
+        <label class="check-row privacy-consent"><input data-path="client.consent" type="checkbox" ${state.quote.client.consent ? 'checked' : ''}> Acepto que EMC use estos datos para preparar la cotización y contactarme. No se comparten con terceros.</label>
+        <div class="notice"><strong>Fotografías:</strong> no son necesarias para generar el folio. Si EMC las necesita para confirmar el precio, podrás enviarlas después por WhatsApp.</div>
+      </div>
+      <div class="quote-section">
+        <h3>Resumen antes de enviar</h3>
+        <div class="summary-line"><span>Inmueble</span><strong>${state.quote.client.propertyType}</strong></div>
+        <div class="summary-line"><span>Superficie</span><strong>${projectSquareMeters()} m²</strong></div>
+        <div class="summary-line"><span>Aplicación</span><strong>${state.quote.project.applicationType}</strong></div>
+        <div class="summary-line"><span>Condición</span><strong>${state.quote.diagnostic.surfaceCondition}</strong></div>
+        <div class="summary-line"><span>Paquete</span><strong>${levels[calc.level].label}</strong></div>
+        <div class="summary-line"><span>Fotografías</span><strong>Se pedirán por WhatsApp sólo si hacen falta</strong></div>
+      </div>
+      <div class="actions quote-actions">
+        <button class="btn btn-primary btn-hero" data-action="accept" type="button"><strong>Recibir mi cotización por WhatsApp</strong><small>Generar folio y guardar solicitud</small></button>
+        <button class="btn btn-ghost" data-action="prev" type="button">Modificar paquete</button>
+      </div>
+      <div class="quote-validity">Cotización preliminar con vigencia de 15 días. Precio sujeto a confirmación de medidas, fotografías o visita técnica.</div>
+    </div>
   `;
 }
 
@@ -1761,7 +1924,7 @@ function success() {
         <div class="success-mark">✓</div>
         <h2>Recibimos tu solicitud</h2>
         <p>Folio: <strong>${quote.folio}</strong></p>
-        <p class="muted">EMC revisará tus datos, fotos y condiciones capturadas para confirmar alcance y agenda.</p>
+        <p class="muted">EMC revisará tus datos y condiciones para confirmar alcance y agenda. Sólo te pedirá fotografías si realmente hacen falta.</p>
         <div class="success-summary">
           <span>Total preliminar</span>
           <strong>${money(quote.calculation?.total)}</strong>
@@ -1794,7 +1957,7 @@ function photoSignature() {
 }
 
 function maybeAnalyzePhotosAutomatically() {
-  if (state.view !== 'quote' || state.step !== 2) return;
+  if (state.view !== 'quote' || state.step !== 0) return;
   if (state.analyzingPhotos) return;
   if (state.quote.photos.length < 4) return;
   const signature = photoSignature();
@@ -1827,31 +1990,21 @@ function validationMessage() {
   const q = state.quote;
   syncProjectSquareMeters();
   if (state.step === 0) {
-    if (!q.client.name.trim()) return 'Escribe tu nombre.';
-    if (q.client.phone.replace(/\D/g, '').length < 10) return 'Escribe tu WhatsApp con 10 dígitos.';
-  }
-  if (state.step === 1) {
     if (projectSquareMeters() <= 0) return 'Pon metros aproximados. Si no sabes, pon 100 y EMC lo confirma.';
     if (q.project.applicationType === 'Interior y exterior' && (!Number(q.project.interiorSquareMeters || 0) || !Number(q.project.exteriorSquareMeters || 0))) {
       return 'Pon un aproximado por dentro y por fuera.';
     }
     if (Number(q.project.heightMeters) > 15) return 'Revisa la altura: parece demasiado alta para una cotización rápida.';
+    if (photoReviewPending()) return 'Espera unos segundos: el sistema está terminando la revisión de fotos.';
   }
-  if (state.step === 2 && photoReviewPending()) return 'Espera unos segundos: el sistema está terminando la revisión de fotos antes de recomendar un nivel.';
-  if (state.step === 4 && !q.service.selectedLevel) {
-    return 'Elige usar el precio sugerido para continuar.';
+  if (state.step === 1 && !q.service.selectedLevel) {
+    return 'Elige uno de los tres paquetes para continuar.';
   }
-  if (state.step === 4 && isBelowMinimum() && !state.quote.service.riskOverrideAccepted) {
-    return 'Para elegir un nivel más barato que el recomendado, acepta que será alcance limitado.';
-  }
-  if (state.step === 4 && !q.service.paintSupply) {
-    return 'Elige quién compra la pintura.';
-  }
-  if (state.step === 4 && q.service.paintSupply === 'emc' && !q.service.paintId) {
-    return 'Elige una pintura o marca "Yo compro la pintura".';
-  }
-  if (state.step === 4 && q.service.paintSupply === 'emc' && needsSealer(q.service.selectedLevel) && !q.service.sealerId) {
-    return 'Elige un sellador o cambia a "Yo compro la pintura".';
+  if (state.step === 2) {
+    if (!q.client.name.trim()) return 'Escribe tu nombre.';
+    if (q.client.phone.replace(/\D/g, '').length < 10) return 'Escribe tu WhatsApp con 10 dígitos.';
+    if (!q.client.address.trim()) return 'Escribe tu colonia o zona.';
+    if (!q.client.consent) return 'Acepta el aviso de uso de datos para guardar y enviar la cotización.';
   }
   if (!q.service.invoice && q.service.paymentMethod === 'DAI Bitso a Bitso' && !daiPaymentAvailable()) {
     return 'El pago en DAI Bitso a Bitso no está disponible. Elige efectivo o pide a EMC activar DAI.';
@@ -1905,7 +2058,9 @@ function bind() {
       if (action === 'next') {
         const message = validationMessage();
         if (message) return alert(message);
-        const nextStep = Math.min(5, state.step + 1);
+        if (state.step === 0) track('step_1_complete', { detail: `${projectSquareMeters()} m2` });
+        if (state.step === 1) track('price_view', { detail: state.quote.service.selectedLevel });
+        const nextStep = Math.min(2, state.step + 1);
         setView('quote', nextStep);
       }
       if (action === 'accept-recommendation') {
@@ -1923,7 +2078,15 @@ function bind() {
         state.showCrewConfig = !state.showCrewConfig;
         render();
       }
-      if (action === 'accept') await acceptQuote();
+      if (action === 'accept') {
+        button.disabled = true;
+        try {
+          await acceptQuote();
+        } catch (error) {
+          button.disabled = false;
+          alert(error.message || 'No se pudo guardar la cotización. Intenta nuevamente.');
+        }
+      }
       if (action === 'analyze-photos') await analyzePhotos();
       if (action === 'print-pdf') window.print();
       if (action === 'copy-summary') {
@@ -1963,6 +2126,7 @@ function bind() {
   document.querySelectorAll('[data-path]').forEach(field => {
     field.addEventListener('input', event => {
       let value = event.target.value;
+      if (event.target.type === 'checkbox') value = event.target.checked;
       if (event.target.type === 'number') value = Number(value);
       if (event.target.dataset.path === 'service.invoice') {
         value = value === 'true';
@@ -1971,7 +2135,18 @@ function bind() {
       update(event.target.dataset.path, value);
       if (event.target.dataset.path.startsWith('project.')) syncProjectSquareMeters();
       if (event.target.dataset.path === 'project.applicationType') render();
-      if (state.step >= 4) render();
+      if (state.step >= 1 && event.target.tagName === 'SELECT') render();
+    });
+  });
+
+  document.querySelectorAll('[data-select-package]').forEach(button => {
+    button.addEventListener('click', () => {
+      const level = button.dataset.selectPackage;
+      state.quote.service.selectedLevel = level;
+      state.quote.service.riskOverrideAccepted = true;
+      state.quote.service.paintSupply = 'cliente';
+      track('package_selected', { detail: level });
+      render();
     });
   });
 
@@ -2087,6 +2262,7 @@ function bind() {
       state.quote.photos = state.quote.photos.filter(Boolean).slice(0, 10);
       state.photoAnalysis = null;
       state.photoAnalysisSignature = '';
+      track('photo_upload', { detail: photo.label });
       render();
     });
   });
@@ -2101,6 +2277,7 @@ function bind() {
       state.quote.photos = state.quote.photos.slice(0, 10);
       state.photoAnalysis = null;
       state.photoAnalysisSignature = '';
+      if (files.length) track('photo_upload', { detail: `${files.length} fotos adicionales` });
       render();
     });
   }
@@ -2158,7 +2335,7 @@ async function analyzePhotos(options = {}) {
   state.analyzingPhotos = true;
   if (!options.silent) render();
   try {
-    const response = await fetch('/api/analyze-photos', {
+    const response = await fetch(apiUrl('/api/analyze-photos'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2224,21 +2401,28 @@ async function acceptQuote() {
   };
   const payload = {
     ...state.quote,
+    attribution: campaignAttribution(),
     photos: [],
     photoReview,
-    calculation: calc,
+    calculation: {
+      ...calc,
+      preliminaryRange: preliminaryRange(calc.level)
+    },
     assistant: calc.assistant,
     legal: {
       quote: 'Los precios pueden variar debido a cambios en el mercado mexicano de pinturas, materiales y consumibles. Esta cotización preliminar tiene vigencia de 15 días naturales.',
       technical: 'La cotización se genera con la información disponible. EMC confirmará medidas, condiciones y alcance por WhatsApp antes de iniciar. Si aparecen daños ocultos o cambios de alcance, se explicarán antes de ajustar el servicio.'
     }
   };
-  const response = await fetch('/api/quotes', {
+  const response = await fetch(apiUrl('/api/quotes'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  state.lastSavedQuote = await response.json();
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || 'No se pudo guardar la cotización. Intenta nuevamente.');
+  state.lastSavedQuote = result;
+  track('lead_submit', { detail: result.folio || 'lead guardado' });
   track('quote_sent', { detail: state.lastSavedQuote.folio || 'cotizacion enviada' });
   state.quote = initialQuote();
   state.photoAnalysis = null;
@@ -2276,7 +2460,7 @@ async function sendCollaborator() {
   if (!payload.acceptedByService || !payload.name || !payload.phone) {
     return alert('Acepta el registro como colaborador y captura nombre y teléfono.');
   }
-  await fetch('/api/collaborators', {
+  await fetch(apiUrl('/api/collaborators'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)

@@ -2,9 +2,15 @@
 
 Sistema de cotizacion de servicios de pintura para clientes EMC.
 
-## Portal publico
+## Portal público
 
-El cliente entra desde web, captura datos, sube fotos, recibe recomendacion de servicio y envia solicitud.
+El cliente obtiene una cotización preliminar en tres pasos:
+
+1. Medidas y condiciones.
+2. Precio y paquete.
+3. Contacto y envío por WhatsApp.
+
+La versión activa está en `public/cliente/`. No hay copias antiguas de la app en la raíz ni dentro del servidor.
 
 ## Ejecutar local
 

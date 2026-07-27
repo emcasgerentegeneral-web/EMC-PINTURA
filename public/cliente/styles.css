@@ -2967,6 +2967,90 @@ body {
   }
 }
 
+/* Flujo comercial de tres pasos */
+.progress.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.compact-photo-panel {
+  margin-top: 22px;
+}
+
+.preliminary-price {
+  margin-bottom: 22px;
+}
+
+.preliminary-price strong {
+  font-size: clamp(30px, 5vw, 56px);
+}
+
+.package-comparison {
+  align-items: stretch;
+  margin: 20px 0;
+}
+
+.package-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.package-card.selected {
+  border-color: #177245;
+  box-shadow: 0 0 0 3px rgba(23, 114, 69, 0.13);
+}
+
+.package-card .btn {
+  margin-top: auto;
+}
+
+.package-total {
+  color: var(--navy);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 950;
+  line-height: 1.05;
+}
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.trust-grid span {
+  padding: 13px;
+  border: 1px solid rgba(23, 114, 69, 0.2);
+  border-radius: 10px;
+  background: #f4fbf7;
+  color: var(--navy);
+  font-weight: 850;
+}
+
+.trust-grid span::before {
+  content: '✓ ';
+  color: #177245;
+}
+
+.privacy-consent {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #dbe5f1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.contact-step h2 {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .package-comparison,
+  .trust-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
   body {
     background: #fff !important;
