@@ -263,6 +263,7 @@ function leadWhatsappText(calc = calculate(), savedQuote = null) {
     `Condición: ${q.diagnostic?.surfaceCondition || '-'}`,
     `Paquete: ${levels[calc.level || q.service?.selectedLevel]?.label || '-'}`,
     `Estimado: ${money(range.minimum)} a ${money(range.maximum)}`,
+    'Importante: no incluye pintura ni materiales; se cotizan por separado.',
     `Comentarios: ${q.observations || '-'}`,
     'Me interesa confirmar el precio.'
   ].filter(Boolean).join('\n');
@@ -1983,6 +1984,7 @@ function workForm() {
 
 function success() {
   const quote = state.lastSavedQuote || {};
+  const range = quote.calculation?.preliminaryRange || preliminaryRange(quote.calculation?.level || 'medio');
   const whatsapp = whatsappUrl(leadWhatsappText(quote.calculation || {}, quote));
   return `
     ${topbar('Cotización enviada')}
@@ -1993,9 +1995,10 @@ function success() {
         <p>Folio: <strong>${quote.folio}</strong></p>
         <p class="muted">EMC revisará tus datos y condiciones para confirmar alcance y agenda. Sólo te pedirá fotografías si realmente hacen falta.</p>
         <div class="success-summary">
-          <span>Total preliminar</span>
-          <strong>${money(quote.calculation?.total)}</strong>
+          <span>Inversión preliminar</span>
+          <strong>${money(range.minimum)} a ${money(range.maximum)}</strong>
           <small>${quote.client?.name || ''} · ${quote.client?.serviceNeed || 'Pintura'} · ${quote.client?.city || '-'} · ${quote.project?.squareMeters || '-'} m²</small>
+          <small>Pintura y materiales no incluidos; se cotizan por separado.</small>
         </div>
         ${whatsapp ? `<a class="btn btn-dark" href="${whatsapp}" target="_blank" rel="noopener">Continuar por WhatsApp</a>` : ''}
         <button class="btn btn-ghost" data-action="copy-summary">Copiar resumen</button>
@@ -2125,7 +2128,10 @@ function bind() {
       if (action === 'next') {
         const message = validationMessage();
         if (message) return alert(message);
-        if (state.step === 0) track('step_1_complete', { detail: `${projectSquareMeters()} m2` });
+        if (state.step === 0) {
+          if (!state.quote.service.selectedLevel) state.quote.service.selectedLevel = scoreDiagnostic();
+          track('step_1_complete', { detail: `${projectSquareMeters()} m2` });
+        }
         if (state.step === 1) track('price_view', { detail: state.quote.service.selectedLevel });
         const nextStep = Math.min(2, state.step + 1);
         setView('quote', nextStep);

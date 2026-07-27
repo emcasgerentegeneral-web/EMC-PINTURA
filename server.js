@@ -417,6 +417,12 @@ async function deleteAnalyticsEvent(eventId) {
   return true;
 }
 
+async function resetAnalyticsEvents() {
+  const events = await listAnalyticsEvents();
+  await saveAnalyticsEvents([]);
+  return events.length;
+}
+
 function sameDay(date, reference) {
   return date.toISOString().slice(0, 10) === reference.toISOString().slice(0, 10);
 }
@@ -893,6 +899,12 @@ async function handleApi(req, res) {
       if (!analyticsAccessAllowed(req, url)) return send(res, 401, { error: 'Clave incorrecta' });
       const events = await listAnalyticsEvents();
       return send(res, 200, analyticsSummary(events));
+    }
+
+    if (url.pathname === '/api/visits/reset' && req.method === 'DELETE') {
+      if (!analyticsAccessAllowed(req, url)) return send(res, 401, { error: 'Clave incorrecta' });
+      const deleted = await resetAnalyticsEvents();
+      return send(res, 200, { reset: true, deleted });
     }
 
     if (url.pathname.startsWith('/api/visits/events/') && req.method === 'DELETE') {

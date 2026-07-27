@@ -14,7 +14,10 @@
           <h1>Visitas y clientes</h1>
           <p>Un tablero simple para saber si la página está trayendo gente.</p>
         </div>
-        <button id="refresh" type="button">Actualizar</button>
+        <div class="hero-actions">
+          <button id="refresh" type="button">Actualizar</button>
+          <button id="reset-visits" class="danger-button" type="button">Reiniciar contador</button>
+        </div>
       </section>
 
       <section id="login" class="panel login-panel">
@@ -30,6 +33,14 @@
       </section>
 
       <section id="dashboard" class="dashboard" hidden>
+        <section class="panel reset-panel">
+          <div>
+            <h2>Control del contador</h2>
+            <p>Elimina todas las visitas y movimientos registrados para comenzar nuevamente desde cero.</p>
+          </div>
+          <button id="reset-visits-dashboard" class="danger-button" type="button">Reiniciar contador de visitas</button>
+        </section>
+
         <div class="cards">
           <article>
             <span>Hoy</span>

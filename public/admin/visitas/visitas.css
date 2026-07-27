@@ -34,6 +34,24 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.danger-button {
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: #b42318;
+  color: #fff;
+}
+
 .visits-shell {
   width: min(100%, 1180px);
   margin: 0 auto;
@@ -122,6 +140,23 @@ input {
   margin-top: 24px;
   display: grid;
   gap: 18px;
+}
+
+.reset-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.reset-panel h2 {
+  margin-bottom: 5px;
+}
+
+.reset-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
 }
 
 .cards {
@@ -215,6 +250,12 @@ input {
     background:
       linear-gradient(180deg, rgba(7, 29, 54, 0.96), rgba(7, 29, 54, 0.94)),
       var(--navy);
+  }
+
+  .hero-actions,
+  .reset-panel {
+    align-items: stretch;
+    display: grid;
   }
 
   .grid,

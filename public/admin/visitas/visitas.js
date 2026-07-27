@@ -3,6 +3,8 @@ const dashboard = document.querySelector('#dashboard');
 const form = document.querySelector('#login-form');
 const password = document.querySelector('#password');
 const refresh = document.querySelector('#refresh');
+const resetVisits = document.querySelector('#reset-visits');
+const resetVisitsDashboard = document.querySelector('#reset-visits-dashboard');
 const storageKey = 'emc_visitas_clave';
 
 function fmtDate(value) {
@@ -78,6 +80,33 @@ async function loadSummary(clave) {
   renderRecent(data.recent || []);
 }
 
+async function resetCounter() {
+  const clave = localStorage.getItem(storageKey) || password.value;
+  if (!clave) {
+    password.focus();
+    return;
+  }
+  const accepted = window.confirm('¿Eliminar todas las visitas y movimientos? El contador volverá a cero y esta acción no se puede deshacer.');
+  if (!accepted) return;
+
+  resetVisits.disabled = true;
+  resetVisitsDashboard.disabled = true;
+  try {
+    const response = await fetch(`/api/visits/reset?clave=${encodeURIComponent(clave)}`, {
+      method: 'DELETE'
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'No se pudo reiniciar el contador');
+    await loadSummary(clave);
+    alert(`Contador reiniciado. Se eliminaron ${data.deleted || 0} movimientos.`);
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    resetVisits.disabled = false;
+    resetVisitsDashboard.disabled = false;
+  }
+}
+
 form.addEventListener('submit', async event => {
   event.preventDefault();
   try {
@@ -96,6 +125,9 @@ refresh.addEventListener('click', async () => {
     alert(error.message);
   }
 });
+
+resetVisits.addEventListener('click', resetCounter);
+resetVisitsDashboard.addEventListener('click', resetCounter);
 
 const saved = localStorage.getItem(storageKey);
 if (saved) {
