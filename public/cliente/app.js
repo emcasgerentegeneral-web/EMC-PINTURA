@@ -129,7 +129,7 @@ const levels = {
     price: 62,
     ideal: 'Casas habitadas, cambio de color, mantenimiento ligero y paredes en buen estado.',
     scope: 'Protección básica de muebles y pisos, limpieza superficial de polvo, corrección de imperfecciones menores, aplicación de 2 manos de pintura y limpieza final del área.',
-    includes: ['Protección básica', 'Limpieza superficial', 'Imperfecciones menores', 'Pintura 2 manos', 'Limpieza final'],
+    includes: ['Protección básica', 'Limpieza superficial', 'Imperfecciones menores', 'Aplicación de 2 manos', 'Limpieza final'],
     excludes: ['Resanes extensos', 'Sellador', 'Tratamiento de humedad', 'Raspado completo', 'Reparación de grietas'],
     when: 'Ideal para paredes sanas o mantenimiento ligero donde el objetivo principal es pintar.'
   },
@@ -151,7 +151,7 @@ const levels = {
     price: 180,
     ideal: 'Casas premium, remodelaciones, entrega de propiedades y clientes exigentes.',
     scope: 'Incluye Medio más raspado total donde sea necesario, resane completo, sellador, corrección de detalles finos, preparación integral, protección detallada, aplicación de pintura premium, acabado uniforme de alta calidad, inspección final EMC y garantía extendida.',
-    includes: ['Todo lo del Medio', 'Raspado total necesario', 'Resane completo', 'Sellador', 'Detalles finos', 'Protección detallada', 'Pintura premium', 'Inspección final EMC', 'Garantía extendida'],
+    includes: ['Todo lo del Medio', 'Raspado total necesario', 'Resane completo', 'Sellador', 'Detalles finos', 'Protección detallada', 'Aplicación de 3 manos', 'Inspección final EMC', 'Garantía extendida'],
     excludes: ['Corrección estructural mayor no relacionada con pintura'],
     when: 'Ideal para remodelaciones, entrega de propiedades, daño importante o acabado de mayor prestigio.'
   }
@@ -860,6 +860,10 @@ function packageCard(key, recommendedLevel) {
       <p class="package-intent">${level.short}</p>
       <div class="package-total">${money(range.minimum)} a ${money(range.maximum)}</div>
       <strong class="package-rate">${money(range.rate)}/m² · ${level.coats} manos</strong>
+      <div class="package-materials-note" role="note">
+        <strong>Pintura y materiales no incluidos</strong>
+        <span>Se cotizan por separado según marca, color y rendimiento.</span>
+      </div>
       <small class="package-scope">${level.scope}</small>
       <ul class="clean-list compact">${level.includes.slice(0, 6).map(item => `<li>${item}</li>`).join('')}</ul>
       <button class="btn ${selected ? 'btn-dark' : 'btn-primary'}" data-select-package="${key}" type="button" aria-pressed="${selected}">${selected ? 'Paquete elegido' : `Elegir ${level.label}`}</button>

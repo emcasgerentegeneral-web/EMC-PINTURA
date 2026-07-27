@@ -4659,6 +4659,30 @@ body {
   font-size: 11px;
 }
 
+.package-materials-note {
+  padding: 11px 12px;
+  border: 1px solid rgba(181, 120, 0, 0.28);
+  border-left: 4px solid var(--emc-sun-deep);
+  border-radius: 10px;
+  background: #fff7d9;
+  display: grid;
+  gap: 3px;
+}
+
+.package-materials-note strong {
+  color: #5b3c00;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.package-materials-note span {
+  color: #78633b;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: none;
+}
+
 .package-scope {
   min-height: 86px;
   color: var(--emc-muted);
