@@ -597,31 +597,51 @@ function calculate() {
 
 function home() {
   return `
-    <section class="home">
+    <section class="home home-premium">
       <div class="home-card">
-        <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
-        <p class="division">EMC Pintura · Villahermosa, Centro y municipios cercanos</p>
-        <h1>Calcula cuánto cuesta pintar tu casa o negocio.</h1>
-        <p class="home-tagline">Obtén un precio preliminar según los metros cuadrados y el estado de la superficie. Gratis y sin compromiso.</p>
-        <div class="benefits">
-          <span>Gratis</span>
-          <span>Rápido</span>
-          <span>Seguimiento por WhatsApp</span>
+        <div class="hero-layout">
+          <div class="hero-copy">
+            <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
+            <p class="division">Cotización inteligente de pintura · Tabasco</p>
+            <h1>Un gran acabado comienza con un precio claro.</h1>
+            <p class="home-tagline">Calcula una inversión preliminar para pintar tu casa o negocio. Primero conoces el precio; después decides si quieres continuar.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-hero" data-action="quote">
+                <strong>Calcular mi proyecto</strong>
+                <small>Precio antes de dejar tus datos</small>
+              </button>
+              ${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.') ? `<a class="btn hero-whatsapp" href="${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.')}" target="_blank" rel="noopener"><strong>Hablar por WhatsApp</strong><small>Atención directa con EMC</small></a>` : ''}
+            </div>
+            <div class="benefits" aria-label="Ventajas del cotizador">
+              <span>Sin fotografías obligatorias</span>
+              <span>Estimado inmediato</span>
+              <span>Sin compromiso</span>
+            </div>
+          </div>
+          <aside class="hero-preview" aria-label="Resumen del proceso">
+            <span class="hero-preview-label">Experiencia EMC</span>
+            <strong>De la idea al presupuesto en 3 pasos.</strong>
+            <div class="hero-preview-list">
+              <span><b>01</b> Medidas aproximadas</span>
+              <span><b>02</b> Comparación de paquetes</span>
+              <span><b>03</b> Folio y seguimiento</span>
+            </div>
+            <small>EMC confirma medidas, alcance y agenda antes de iniciar.</small>
+          </aside>
         </div>
         ${homeProcess()}
-        <div class="button-stack">
-          <button class="btn btn-primary btn-hero" data-action="quote">
-            <strong>Calcular mi precio</strong>
-            <small>Ve el estimado antes de dejar tus datos</small>
-          </button>
-        </div>
-        ${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.') ? `<a class="home-whatsapp-link" href="${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.')}" target="_blank" rel="noopener" aria-label="Prefiero cotizar por WhatsApp"><strong>Prefiero cotizar por WhatsApp</strong><span aria-hidden="true">WhatsApp</span></a>` : ''}
       </div>
     </section>
-    <section class="seo-strip" aria-label="Servicios de pintura">
-      <div>
-        <strong>Pintura para casas, negocios, oficinas, fachadas y edificios</strong>
-        <span>Atendemos Villahermosa/Centro, Nacajuca, Jalpa de Méndez y Cunduacán. ¿Necesitas mantenimiento, electricidad, herrería o suministros? Solicítalo por WhatsApp.</span>
+    <section class="seo-strip premium-service-strip" aria-label="Cobertura y servicios">
+      <div class="service-strip-copy">
+        <span>Servicio local</span>
+        <strong>Pintura profesional para interiores, exteriores y fachadas.</strong>
+      </div>
+      <div class="service-strip-places">
+        <span>Villahermosa / Centro</span>
+        <span>Nacajuca</span>
+        <span>Jalpa de Méndez</span>
+        <span>Cunduacán</span>
       </div>
     </section>
   `;
@@ -629,18 +649,18 @@ function home() {
 
 function homeProcess() {
   const steps = [
-    ['1', 'Indica área y tipo de inmueble.'],
-    ['2', 'Describe el estado sin subir fotografías.'],
-    ['3', 'Compara paquetes, ve tu precio y decide.']
+    ['01', 'Medidas', 'Indica el área aproximada y el tipo de inmueble.'],
+    ['02', 'Condiciones', 'Describe la superficie con preguntas sencillas.'],
+    ['03', 'Decisión', 'Compara paquetes y continúa sólo si te convence.']
   ];
   return `
     <div class="client-method" aria-label="Método EMC">
-      <span>Cómo obtienes tu precio</span>
+      <span>Simple, transparente y sin presión</span>
       <div class="client-method-grid">
-        ${steps.map(([title, text], index) => `
+        ${steps.map(([number, title, text]) => `
           <div class="client-method-card">
-            <small>${title}</small>
-          <strong>${index === 0 ? 'Medidas' : index === 1 ? 'Condiciones' : 'Precio'}</strong>
+            <small>${number}</small>
+            <strong>${title}</strong>
             <em>${text}</em>
           </div>
         `).join('')}
@@ -775,26 +795,54 @@ function preliminaryRange(level = scoreDiagnostic()) {
 function stepProjectConditions() {
   const p = state.quote.project;
   const d = state.quote.diagnostic;
+  const areaPath = p.applicationType === 'Interior' ? 'project.interiorSquareMeters' : p.applicationType === 'Exterior' ? 'project.exteriorSquareMeters' : '';
   return `
-    <div class="card visual-card project-visual">
+    <div class="card visual-card project-visual premium-step-card">
       ${workVisual('/assets/emc-uniforme-exterior.png', 'Calcula con medidas aproximadas', 'No necesitas tener un plano. EMC confirmará las medidas antes de iniciar el trabajo.')}
-      <h2>¿Qué quieres pintar?</h2>
-      <p class="muted">Indica lo que sabes. No necesitas fotografías para obtener el precio preliminar.</p>
-      <div class="form-grid">
-        ${select('client.propertyType', 'Tipo de inmueble', ['Casa', 'Oficina', 'Local', 'Restaurante', 'Clínica', 'Bodega', 'Escuela', 'Edificio', 'Otro'])}
-        ${select('project.applicationType', 'Área que se pintará', ['Interior', 'Exterior', 'Interior y exterior'])}
-        ${p.applicationType === 'Interior' ? input('project.interiorSquareMeters', 'm² aproximados interiores', 'number', 'min="1" inputmode="decimal" required') : ''}
-        ${p.applicationType === 'Exterior' ? input('project.exteriorSquareMeters', 'm² aproximados exteriores', 'number', 'min="1" inputmode="decimal" required') : ''}
-        ${p.applicationType === 'Interior y exterior' ? `
-          ${input('project.interiorSquareMeters', 'm² interiores', 'number', 'min="1" inputmode="decimal" required')}
-          ${input('project.exteriorSquareMeters', 'm² exteriores', 'number', 'min="1" inputmode="decimal" required')}
+      <div class="step-heading">
+        <span class="eyebrow">Paso 1 · Tu proyecto</span>
+        <h2>Cuéntanos qué quieres transformar.</h2>
+        <p class="muted">Usa medidas aproximadas. El objetivo es darte una referencia útil, no pedirte un levantamiento técnico.</p>
+      </div>
+      <div class="form-section">
+        <div class="form-section-heading">
+          <span>01</span>
+          <div><strong>Espacio y dimensiones</strong><small>Los datos indispensables para calcular.</small></div>
+        </div>
+        <div class="form-grid">
+          ${select('client.propertyType', 'Tipo de inmueble', ['Casa', 'Oficina', 'Local', 'Restaurante', 'Clínica', 'Bodega', 'Escuela', 'Edificio', 'Otro'])}
+          ${select('project.applicationType', 'Área que se pintará', ['Interior', 'Exterior', 'Interior y exterior'])}
+          ${p.applicationType === 'Interior' ? input('project.interiorSquareMeters', 'm² aproximados interiores', 'number', 'min="1" inputmode="decimal" required placeholder="Ej. 100"') : ''}
+          ${p.applicationType === 'Exterior' ? input('project.exteriorSquareMeters', 'm² aproximados exteriores', 'number', 'min="1" inputmode="decimal" required placeholder="Ej. 80"') : ''}
+          ${p.applicationType === 'Interior y exterior' ? `
+            ${input('project.interiorSquareMeters', 'm² interiores', 'number', 'min="1" inputmode="decimal" required placeholder="Ej. 100"')}
+            ${input('project.exteriorSquareMeters', 'm² exteriores', 'number', 'min="1" inputmode="decimal" required placeholder="Ej. 60"')}
+          ` : ''}
+          ${input('project.floors', 'Número de plantas', 'number', 'min="1" max="20" inputmode="numeric" placeholder="Ej. 1"')}
+          ${input('project.heightMeters', 'Altura aproximada (opcional)', 'number', 'min="1" max="15" step="0.1" inputmode="decimal" placeholder="Ej. 2.8"')}
+        </div>
+        ${areaPath ? `
+          <div class="area-presets">
+            <span>¿No sabes los m²? Elige una referencia:</span>
+            <div>
+              ${[50, 100, 150, 200].map(value => `<button type="button" data-area-preset="${value}" data-area-path="${areaPath}">${value} m²</button>`).join('')}
+            </div>
+            <small>Una recámara suele rondar 25–35 m² de superficie a pintar; una casa puede variar ampliamente. EMC confirmará la medida.</small>
+          </div>
         ` : ''}
-        ${input('project.floors', 'Número de plantas', 'number', 'min="1" max="20" inputmode="numeric" placeholder="Ej. 1"')}
-        ${input('project.heightMeters', 'Altura aproximada en metros (opcional)', 'number', 'min="1" max="15" step="0.1" inputmode="decimal"')}
-        ${select('diagnostic.surfaceCondition', 'Estado de la superficie', ['Buen estado', 'Resanes ligeros', 'Resanes fuertes'])}
-        ${select('diagnostic.moisture', 'Humedad, moho o salitre', ['No visible', 'Humedad, moho o salitre', 'No estoy seguro'])}
-        ${select('diagnostic.colorChange', 'Cambio de color', ['Similar', 'Claro a oscuro', 'Oscuro a claro'])}
-        ${select('diagnostic.accessDifficulty', 'Acceso al área', ['Normal', 'Escalera', 'Andamio o acceso especial', 'No estoy seguro'])}
+      </div>
+      <div class="form-section">
+        <div class="form-section-heading">
+          <span>02</span>
+          <div><strong>Condición de la superficie</strong><small>Esto determina la preparación recomendada.</small></div>
+        </div>
+        <div class="form-grid">
+          ${select('diagnostic.surfaceCondition', 'Estado de la superficie', ['Buen estado', 'Resanes ligeros', 'Resanes fuertes'])}
+          ${select('diagnostic.moisture', 'Humedad, moho o salitre', ['No visible', 'Humedad, moho o salitre', 'No estoy seguro'])}
+          ${select('diagnostic.colorChange', 'Cambio de color', ['Similar', 'Claro a oscuro', 'Oscuro a claro'])}
+          ${select('diagnostic.accessDifficulty', 'Acceso al área', ['Normal', 'Escalera', 'Andamio o acceso especial', 'No estoy seguro'])}
+        </div>
+        <div class="privacy-inline"><strong>Sin fotografías.</strong> Puedes obtener el estimado ahora y enviarlas después sólo si hacen falta.</div>
       </div>
       ${navActions('Ver mi precio')}
     </div>
@@ -807,14 +855,14 @@ function packageCard(key, recommendedLevel) {
   const selected = state.quote.service.selectedLevel === key;
   return `
     <article class="service-choice-card package-card ${key === recommendedLevel ? 'recommended' : ''} ${selected ? 'selected' : ''}">
-      <span>${key === recommendedLevel ? 'Recomendado para tu proyecto' : key === 'medio' ? 'Más solicitado' : 'Opción disponible'}</span>
+      <span class="package-badge">${key === recommendedLevel ? 'Recomendado para tu proyecto' : key === 'medio' ? 'Equilibrio y preparación' : key === 'premium' ? 'Máxima renovación' : 'Mantenimiento esencial'}</span>
       <h3>${level.label}</h3>
-      <strong>${money(range.rate)}/m²</strong>
-      <p>${level.short}</p>
+      <p class="package-intent">${level.short}</p>
       <div class="package-total">${money(range.minimum)} a ${money(range.maximum)}</div>
-      <small>${level.coats} manos · ${level.scope}</small>
+      <strong class="package-rate">${money(range.rate)}/m² · ${level.coats} manos</strong>
+      <small class="package-scope">${level.scope}</small>
       <ul class="clean-list compact">${level.includes.slice(0, 6).map(item => `<li>${item}</li>`).join('')}</ul>
-      <button class="btn ${selected ? 'btn-dark' : 'btn-primary'}" data-select-package="${key}" type="button">${selected ? 'Paquete elegido' : `Elegir ${level.label}`}</button>
+      <button class="btn ${selected ? 'btn-dark' : 'btn-primary'}" data-select-package="${key}" type="button" aria-pressed="${selected}">${selected ? 'Paquete elegido' : `Elegir ${level.label}`}</button>
     </article>
   `;
 }
@@ -823,21 +871,27 @@ function stepPricePackages(calc) {
   const recommended = calc.recommendedLevel;
   const range = preliminaryRange(state.quote.service.selectedLevel || recommended);
   return `
-    <div class="card price-step-card">
+    <div class="card price-step-card premium-step-card">
       <div class="quote-total-hero preliminary-price">
-        <span>Precio preliminar de tu proyecto</span>
+        <span>Tu inversión preliminar</span>
         <strong>${money(range.minimum)} a ${money(range.maximum)}</strong>
-        <small>${projectSquareMeters()} m² · ${state.quote.project.applicationType} · mano de obra y preparación; pintura cotizada por separado.</small>
+        <small>${projectSquareMeters()} m² · ${state.quote.project.applicationType} · preparación y mano de obra. La pintura se cotiza por separado.</small>
       </div>
-      <h2>Compara y elige el nivel de servicio</h2>
-      <p class="muted">El rango puede ajustarse después de revisar fotografías o realizar una visita. No has tenido que dejar tus datos para verlo.</p>
+      <div class="step-heading price-heading">
+        <span class="eyebrow">Paso 2 · Elige con claridad</span>
+        <h2>Tres niveles. Un alcance claramente definido.</h2>
+        <p class="muted">Marcamos la opción recomendada según las condiciones que indicaste. Puedes elegir otra y comparar el resultado.</p>
+      </div>
       <div class="service-choice-grid package-comparison">
         ${['basico', 'medio', 'premium'].map(key => packageCard(key, recommended)).join('')}
       </div>
       <div class="trust-grid" aria-label="Compromisos EMC">
         <span>Presupuesto por escrito</span><span>Protección de pisos y mobiliario</span><span>Limpieza al finalizar</span><span>Factura disponible</span><span>Seguimiento por WhatsApp</span><span>Garantía especificada en la cotización</span>
       </div>
-      <div class="notice">El precio mostrado no incluye pintura ni daños ocultos. EMC confirmará el alcance antes de iniciar y nunca modificará el precio sin explicarlo.</div>
+      <div class="price-clarity">
+        <strong>Precio transparente desde el inicio</strong>
+        <span>No incluye pintura, daños ocultos ni trabajos fuera del alcance elegido. Cualquier ajuste se explica y confirma antes de comenzar.</span>
+      </div>
       ${navActions('Continuar con mis datos')}
     </div>
   `;
@@ -846,44 +900,53 @@ function stepPricePackages(calc) {
 function stepContactAndSend(calc) {
   const range = preliminaryRange(calc.level);
   return `
-    <div class="quote-document contact-step">
+    <div class="quote-document contact-step premium-step-card">
       <div class="quote-total-hero">
-        <span>Tu proyecto podría costar</span>
+        <span>Tu proyecto seleccionado</span>
         <strong>${money(range.minimum)} a ${money(range.maximum)}</strong>
         <small>${projectSquareMeters()} m² · paquete ${levels[calc.level].label} · ${calc.coats} manos.</small>
       </div>
-      <div class="quote-section">
-        <h2>¿Dónde te enviamos la cotización?</h2>
-        <p class="muted">Sólo necesitamos estos datos para guardar tu folio y continuar por WhatsApp.</p>
-        <div class="form-grid">
-          ${input('client.name', 'Nombre', 'text', 'required autocomplete="name"')}
-          ${input('client.phone', 'WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel"')}
-          ${input('client.address', 'Colonia o zona', 'text', 'required autocomplete="address-level3"')}
-          ${select('client.city', 'Ciudad o municipio', ['Villahermosa / Centro', 'Cunduacán', 'Jalpa de Méndez', 'Nacajuca', 'Otro'])}
-          ${input('client.email', 'Correo (opcional)', 'email', 'autocomplete="email"')}
-          ${input('client.company', 'Empresa o negocio (opcional)', 'text', 'autocomplete="organization"')}
-          ${select('client.urgency', 'Cuándo lo necesitas', ['Urgente', 'Esta semana', 'Este mes', 'Estoy comparando precios'])}
-          <label>Factura
-            <select data-path="service.invoice">
-              <option value="false" ${state.quote.service.invoice ? '' : 'selected'}>Sin factura</option>
-              <option value="true" ${state.quote.service.invoice ? 'selected' : ''}>Con factura + IVA</option>
-            </select>
+      <div class="contact-layout">
+        <div class="quote-section contact-form-panel">
+          <span class="eyebrow">Paso 3 · Recibe tu folio</span>
+          <h2>¿Dónde te enviamos la cotización?</h2>
+          <p class="muted">Sólo necesitamos estos datos para guardar tu proyecto y continuar contigo por WhatsApp.</p>
+          <div class="form-grid">
+            ${input('client.name', 'Nombre', 'text', 'required autocomplete="name" placeholder="Tu nombre"')}
+            ${input('client.phone', 'WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel" placeholder="10 dígitos"')}
+            ${input('client.address', 'Colonia o zona', 'text', 'required autocomplete="address-level3" placeholder="Ej. Atasta"')}
+            ${select('client.city', 'Ciudad o municipio', ['Villahermosa / Centro', 'Cunduacán', 'Jalpa de Méndez', 'Nacajuca', 'Otro'])}
+            ${input('client.email', 'Correo (opcional)', 'email', 'autocomplete="email" placeholder="tu@correo.com"')}
+            ${input('client.company', 'Empresa o negocio (opcional)', 'text', 'autocomplete="organization"')}
+            ${select('client.urgency', 'Cuándo lo necesitas', ['Urgente', 'Esta semana', 'Este mes', 'Estoy comparando precios'])}
+            <label>Factura
+              <select data-path="service.invoice">
+                <option value="false" ${state.quote.service.invoice ? '' : 'selected'}>Sin factura</option>
+                <option value="true" ${state.quote.service.invoice ? 'selected' : ''}>Con factura + IVA</option>
+              </select>
+            </label>
+          </div>
+          <label>Comentarios o solicitud de visita
+            <textarea data-path="observations" placeholder="Ej. Me interesa una visita para confirmar medidas">${state.quote.observations || ''}</textarea>
           </label>
+          <label class="check-row privacy-consent"><input data-path="client.consent" type="checkbox" ${state.quote.client.consent ? 'checked' : ''}> Acepto que EMC use estos datos para preparar la cotización y contactarme. No se comparten con terceros.</label>
+          <div class="privacy-inline"><strong>Tú mantienes el control.</strong> Las fotografías no son obligatorias y sólo se pedirán después si ayudan a confirmar el alcance.</div>
         </div>
-        <label>Comentarios o solicitud de visita
-          <textarea data-path="observations" placeholder="Ej. Me interesa una visita para confirmar medidas">${state.quote.observations || ''}</textarea>
-        </label>
-        <label class="check-row privacy-consent"><input data-path="client.consent" type="checkbox" ${state.quote.client.consent ? 'checked' : ''}> Acepto que EMC use estos datos para preparar la cotización y contactarme. No se comparten con terceros.</label>
-        <div class="notice"><strong>Fotografías:</strong> no son necesarias para generar el folio. Si EMC las necesita para confirmar el precio, podrás enviarlas después por WhatsApp.</div>
-      </div>
-      <div class="quote-section">
-        <h3>Resumen antes de enviar</h3>
-        <div class="summary-line"><span>Inmueble</span><strong>${state.quote.client.propertyType}</strong></div>
-        <div class="summary-line"><span>Superficie</span><strong>${projectSquareMeters()} m²</strong></div>
-        <div class="summary-line"><span>Aplicación</span><strong>${state.quote.project.applicationType}</strong></div>
-        <div class="summary-line"><span>Condición</span><strong>${state.quote.diagnostic.surfaceCondition}</strong></div>
-        <div class="summary-line"><span>Paquete</span><strong>${levels[calc.level].label}</strong></div>
-        <div class="summary-line"><span>Fotografías</span><strong>Se pedirán por WhatsApp sólo si hacen falta</strong></div>
+        <aside class="quote-section project-summary-panel">
+          <span class="eyebrow">Resumen del proyecto</span>
+          <h3>Todo listo para enviar</h3>
+          <div class="summary-line"><span>Inmueble</span><strong>${state.quote.client.propertyType}</strong></div>
+          <div class="summary-line"><span>Superficie</span><strong>${projectSquareMeters()} m²</strong></div>
+          <div class="summary-line"><span>Aplicación</span><strong>${state.quote.project.applicationType}</strong></div>
+          <div class="summary-line"><span>Condición</span><strong>${state.quote.diagnostic.surfaceCondition}</strong></div>
+          <div class="summary-line"><span>Paquete</span><strong>${levels[calc.level].label}</strong></div>
+          <div class="summary-line"><span>Fotografías</span><strong>Después, sólo si hacen falta</strong></div>
+          <div class="summary-assurances">
+            <span>Folio identificable</span>
+            <span>Seguimiento por WhatsApp</span>
+            <span>Vigencia de 15 días</span>
+          </div>
+        </aside>
       </div>
       <div class="actions quote-actions">
         <button class="btn btn-primary btn-hero" data-action="accept" type="button"><strong>Recibir mi cotización por WhatsApp</strong><small>Generar folio y guardar solicitud</small></button>
@@ -2146,6 +2209,18 @@ function bind() {
       state.quote.service.riskOverrideAccepted = true;
       state.quote.service.paintSupply = 'cliente';
       track('package_selected', { detail: level });
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-area-preset]').forEach(button => {
+    button.addEventListener('click', () => {
+      const path = button.dataset.areaPath;
+      const value = Number(button.dataset.areaPreset);
+      if (!path || !value) return;
+      update(path, value);
+      syncProjectSquareMeters();
+      track('area_preset_selected', { detail: `${value} m2` });
       render();
     });
   });
