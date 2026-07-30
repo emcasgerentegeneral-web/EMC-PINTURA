@@ -936,6 +936,25 @@ async function handleApi(req, res) {
       return send(res, 200, recordsSummary(await listQuotes()));
     }
 
+    if (url.pathname === '/api/records/health' && req.method === 'GET') {
+      if (!recordsAccessAllowed(req, url)) return send(res, 401, { error: 'Clave incorrecta' });
+      return send(res, 200, {
+        checkedAt: new Date().toISOString(),
+        storage: {
+          provider: USE_SUPABASE ? 'supabase' : 'local',
+          configured: USE_SUPABASE
+        },
+        notifications: {
+          emailConfigured: Boolean(RESEND_API_KEY && ALERT_EMAIL_FROM && ALERT_EMAIL_TO),
+          provider: RESEND_API_KEY ? 'resend' : 'none'
+        },
+        followUp: {
+          publicWhatsappConfigured: Boolean(PUBLIC_WHATSAPP_NUMBER),
+          adminPanelConfigured: Boolean(ADMIN_PANEL_URL)
+        }
+      });
+    }
+
     if (!PUBLIC_CLIENT_ONLY && url.pathname === '/api/admin/login' && req.method === 'POST') {
       const body = await parseBody(req);
       if (body.email === ADMIN_USER && body.password === ADMIN_PASSWORD) {
