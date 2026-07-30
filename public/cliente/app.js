@@ -335,11 +335,11 @@ async function loadConfig() {
     state.config = await configResponse.json();
     state.aiStatus = { configured: false };
   }
+  track('pageview', { detail: 'cliente inicio' });
   if (new URLSearchParams(window.location.search).get('start') === 'quote') {
     startNewQuote();
   } else {
     render();
-    track('pageview', { detail: 'cliente inicio' });
   }
   Promise.all([
     fetch(apiUrl('/api/config'), { cache: 'no-store' }).then(response => response.ok ? response.json() : null),
