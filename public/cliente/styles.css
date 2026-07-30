@@ -4120,6 +4120,70 @@ body {
   line-height: 1.45;
 }
 
+.color-render-cta {
+  padding: 20px;
+  border: 1px solid rgba(67, 214, 163, 0.42);
+  border-radius: 18px;
+  background:
+    linear-gradient(110deg, rgba(67, 214, 163, 0.13), rgba(55, 126, 184, 0.12)),
+    rgba(7, 17, 31, 0.68);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 0.42fr);
+  gap: 20px;
+  align-items: center;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.18);
+}
+
+.color-render-cta > div:first-child {
+  display: grid;
+  gap: 6px;
+}
+
+.color-render-cta span {
+  color: var(--emc-mint);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.color-render-cta > div > strong {
+  color: #fff;
+  font-size: clamp(18px, 1.8vw, 24px);
+  line-height: 1.2;
+}
+
+.color-render-cta p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.color-render-action {
+  display: grid;
+  gap: 8px;
+}
+
+.color-render-button {
+  min-height: 58px;
+  border: 1px solid rgba(113, 238, 192, 0.72);
+  background: linear-gradient(180deg, #50daa8, #2ebc8a);
+  color: #07111f;
+  text-decoration: none;
+}
+
+.color-render-button:hover {
+  filter: brightness(1.06);
+}
+
+.color-render-action > small {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .hero-preview {
   padding: 26px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -4958,6 +5022,12 @@ body {
     grid-template-columns: 1fr;
     padding: 15px 16px;
     gap: 8px;
+  }
+
+  .color-render-cta {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 14px;
   }
 
   .home-premium .client-method-grid {

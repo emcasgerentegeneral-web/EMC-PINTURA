@@ -347,6 +347,7 @@ function cleanAnalyticsEvent(req, body = {}) {
     'visit_booked',
     'sale_closed',
     'whatsapp_click',
+    'render_interest',
     'collaborator_start',
     'collaborator_sent'
   ]);
@@ -473,6 +474,7 @@ function analyticsSummary(events) {
       quoteSent: events.filter(event => event.type === 'quote_sent').length,
       leads: events.filter(event => event.type === 'lead_submit').length,
       whatsappClicks: events.filter(event => event.type === 'whatsapp_click').length,
+      renderInterests: events.filter(event => event.type === 'render_interest').length,
       visitsBooked: events.filter(event => event.type === 'visit_booked').length,
       salesClosed: events.filter(event => event.type === 'sale_closed').length
     },

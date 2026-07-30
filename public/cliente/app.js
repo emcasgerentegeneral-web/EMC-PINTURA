@@ -644,6 +644,7 @@ function home() {
           </aside>
         </div>
         ${seasonalPromotion()}
+        ${colorRenderCta()}
         ${homeProcess()}
       </div>
     </section>
@@ -672,6 +673,29 @@ function seasonalPromotion() {
         <strong>Al contratar un servicio con EMC, te regalamos un galón de pintura del color de tu elección.</strong>
       </div>
       <small>Color sujeto a disponibilidad y compatible con el trabajo contratado. No acumulable con otras promociones.</small>
+    </aside>
+  `;
+}
+
+function colorRenderCta() {
+  const url = whatsappUrl(
+    'Hola, quiero asesoría de color para mi espacio y conocer la opción de preparar un render ilustrativo antes de autorizar el trabajo de pintura. Puedo compartir una fotografía autorizada del lugar.'
+  );
+  if (!url) return '';
+  return `
+    <aside class="color-render-cta" aria-label="Asesoría de color y render ilustrativo">
+      <div>
+        <span>Visualiza antes de decidir</span>
+        <strong>Te asesoramos con el color que mejor le va a tu espacio.</strong>
+        <p>Con una fotografía autorizada podemos preparar un render ilustrativo para revisar la propuesta antes de ejecutar.</p>
+      </div>
+      <div class="color-render-action">
+        <a class="btn color-render-button" href="${url}" target="_blank" rel="noopener" data-render-interest="home">
+          <strong>Solicitar asesoría y render</strong>
+          <small>Continuar por WhatsApp</small>
+        </a>
+        <small>El render es orientativo. El tono final se confirma con una muestra o carta física.</small>
+      </div>
     </aside>
   `;
 }
@@ -2406,6 +2430,9 @@ function bind() {
   document.querySelectorAll('a[href*="wa.me"], a[href*="whatsapp"]').forEach(link => {
     link.addEventListener('click', () => {
       track('whatsapp_click', { detail: link.textContent.trim().slice(0, 120) });
+      if (link.dataset.renderInterest) {
+        track('render_interest', { detail: link.dataset.renderInterest });
+      }
     });
   });
 }
