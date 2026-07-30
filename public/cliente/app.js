@@ -74,6 +74,16 @@ const analyticsSessionId = (() => {
   return id;
 })();
 
+const campaignParams = (() => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    utmSource: params.get('utm_source') || '',
+    utmMedium: params.get('utm_medium') || '',
+    utmCampaign: params.get('utm_campaign') || '',
+    utmContent: params.get('utm_content') || ''
+  };
+})();
+
 function track(type, detail = {}) {
   const payload = {
     type,
@@ -83,6 +93,7 @@ function track(type, detail = {}) {
     sessionId: analyticsSessionId,
     view: state.view,
     step: state.view === 'quote' ? state.step + 1 : null,
+    ...campaignParams,
     ...detail
   };
   if (window.dataLayer) window.dataLayer.push({ event: type, ...payload });

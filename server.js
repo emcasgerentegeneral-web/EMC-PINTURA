@@ -361,6 +361,10 @@ function cleanAnalyticsEvent(req, body = {}) {
     sessionId: String(body.sessionId || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80),
     step: Number.isFinite(Number(body.step)) ? Number(body.step) : null,
     detail: String(body.detail || '').slice(0, 160),
+    utmSource: String(body.utmSource || '').slice(0, 80),
+    utmMedium: String(body.utmMedium || '').slice(0, 80),
+    utmCampaign: String(body.utmCampaign || '').slice(0, 120),
+    utmContent: String(body.utmContent || '').slice(0, 120),
     userAgent: String(req.headers['user-agent'] || '').slice(0, 220),
     ipHash: clientIpHash(req)
   };
@@ -474,6 +478,10 @@ function analyticsSummary(events) {
       } catch (error) {
         return event.referrer;
       }
+    }),
+    topCampaigns: topCounts(pageviews, event => {
+      if (!event.utmCampaign && !event.utmSource) return '';
+      return [event.utmSource || 'sin-fuente', event.utmCampaign || 'sin-campaña', event.utmContent || 'general'].join(' / ');
     }),
     recent: events.slice(-60).reverse()
   };
