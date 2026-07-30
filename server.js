@@ -955,6 +955,23 @@ async function handleApi(req, res) {
       });
     }
 
+    if (url.pathname === '/api/leads/pulse' && req.method === 'GET') {
+      const quotes = await listQuotes();
+      const latest = quotes
+        .filter(quote => quote && quote.folio !== CONFIG_RECORD_FOLIO && quote.folio !== ANALYTICS_RECORD_FOLIO)
+        .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0] || null;
+      const fingerprint = latest
+        ? crypto.createHash('sha256').update(`${latest.folio || ''}:${latest.createdAt || ''}`).digest('hex').slice(0, 16)
+        : '';
+      return send(res, 200, {
+        checkedAt: new Date().toISOString(),
+        total: quotes.filter(quote => quote && quote.folio !== CONFIG_RECORD_FOLIO && quote.folio !== ANALYTICS_RECORD_FOLIO).length,
+        newQuotes: quotes.filter(quote => quote && quote.status === 'Nueva').length,
+        latestCreatedAt: latest?.createdAt || null,
+        fingerprint
+      });
+    }
+
     if (!PUBLIC_CLIENT_ONLY && url.pathname === '/api/admin/login' && req.method === 'POST') {
       const body = await parseBody(req);
       if (body.email === ADMIN_USER && body.password === ADMIN_PASSWORD) {
