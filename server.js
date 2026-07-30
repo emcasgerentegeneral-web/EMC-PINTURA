@@ -405,12 +405,18 @@ async function saveAnalyticsEvents(events) {
   return cleanEvents;
 }
 
+let analyticsWriteQueue = Promise.resolve();
+
 async function createAnalyticsEvent(req, body) {
   const event = cleanAnalyticsEvent(req, body);
-  const events = await listAnalyticsEvents();
-  events.push(event);
-  await saveAnalyticsEvents(events);
-  return { ok: true, id: event.id };
+  const pending = analyticsWriteQueue.then(async () => {
+    const events = await listAnalyticsEvents();
+    events.push(event);
+    await saveAnalyticsEvents(events);
+    return { ok: true, id: event.id };
+  });
+  analyticsWriteQueue = pending.catch(() => {});
+  return pending;
 }
 
 async function deleteAnalyticsEvent(eventId) {
