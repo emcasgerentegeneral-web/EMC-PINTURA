@@ -4080,6 +4080,46 @@ body {
   vertical-align: middle;
 }
 
+.seasonal-promo {
+  padding: 17px 20px;
+  border: 1px solid rgba(255, 212, 71, 0.52);
+  border-radius: 16px;
+  background:
+    linear-gradient(105deg, rgba(255, 212, 71, 0.16), rgba(67, 214, 163, 0.08)),
+    rgba(7, 17, 31, 0.66);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 0.45fr);
+  gap: 18px;
+  align-items: center;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.seasonal-promo > div {
+  display: grid;
+  gap: 5px;
+}
+
+.seasonal-promo span {
+  color: var(--emc-sun);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.seasonal-promo strong {
+  color: #fff;
+  font-size: clamp(16px, 1.7vw, 22px);
+  line-height: 1.25;
+}
+
+.seasonal-promo small {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
 .hero-preview {
   padding: 26px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -4912,6 +4952,12 @@ body {
 
   .home-premium .benefits {
     justify-content: flex-start;
+  }
+
+  .seasonal-promo {
+    grid-template-columns: 1fr;
+    padding: 15px 16px;
+    gap: 8px;
   }
 
   .home-premium .client-method-grid {

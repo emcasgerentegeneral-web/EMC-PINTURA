@@ -149,9 +149,9 @@ const levels = {
     short: 'Renovar y embellecer',
     coats: 3,
     price: 180,
-    ideal: 'Casas premium, remodelaciones, entrega de propiedades y clientes exigentes.',
-    scope: 'Incluye Medio más raspado total donde sea necesario, resane completo, sellador, corrección de detalles finos, preparación integral, protección detallada, aplicación de pintura premium, acabado uniforme de alta calidad, inspección final EMC y garantía extendida.',
-    includes: ['Todo lo del Medio', 'Raspado total necesario', 'Resane completo', 'Sellador', 'Detalles finos', 'Protección detallada', 'Aplicación de 3 manos', 'Inspección final EMC', 'Garantía extendida'],
+    ideal: 'Espacios con desgaste severo, remodelaciones y propiedades que requieren una preparación más completa.',
+    scope: 'Incluye Medio más raspado total donde sea necesario, resane completo, sellador cuando sea compatible con la superficie, corrección de detalles finos, preparación integral, protección detallada, aplicación de 3 manos cuando corresponda al sistema autorizado e inspección final EMC.',
+    includes: ['Todo lo del Medio', 'Raspado total necesario', 'Resane completo', 'Sellador compatible', 'Detalles finos', 'Protección detallada', 'Aplicación de 3 manos cuando corresponda', 'Inspección final EMC'],
     excludes: ['Corrección estructural mayor no relacionada con pintura'],
     when: 'Ideal para remodelaciones, entrega de propiedades, daño importante o acabado de mayor prestigio.'
   }
@@ -205,7 +205,7 @@ function businessWhatsapp() {
   return String(state.config?.contact?.whatsapp || runtime.config?.contact?.whatsapp || '529932869691').replace(/\D/g, '');
 }
 
-function whatsappUrl(text = 'Hola, quiero una cotización para pintar mi casa con EMC Pintura.') {
+function whatsappUrl(text = 'Hola, quiero una cotización de pintura con EMC Pintura.') {
   const phone = businessWhatsapp();
   const message = encodeURIComponent(text);
   return phone ? `https://wa.me/${phone}?text=${message}` : '';
@@ -270,7 +270,8 @@ function leadWhatsappText(calc = calculate(), savedQuote = null) {
 }
 
 function whatsappCta(className = 'floating-whatsapp') {
-  const url = whatsappUrl();
+  const propertyType = state.quote?.client?.propertyType || 'Por definir';
+  const url = whatsappUrl(`Hola, quiero una cotización de pintura con EMC Pintura. Tipo de inmueble: ${propertyType}.`);
   if (!url) return '';
   return `<a class="${className}" href="${url}" target="_blank" rel="noopener">WhatsApp</a>`;
 }
@@ -617,6 +618,7 @@ function home() {
               <span>Sin fotografías obligatorias</span>
               <span>Estimado inmediato</span>
               <span>Sin compromiso</span>
+              <span>Asesoría de color y render preliminar</span>
             </div>
           </div>
           <aside class="hero-preview" aria-label="Resumen del proceso">
@@ -630,6 +632,7 @@ function home() {
             <small>EMC confirma medidas, alcance y agenda antes de iniciar.</small>
           </aside>
         </div>
+        ${seasonalPromotion()}
         ${homeProcess()}
       </div>
     </section>
@@ -645,6 +648,20 @@ function home() {
         <span>Cunduacán</span>
       </div>
     </section>
+  `;
+}
+
+function seasonalPromotion() {
+  const promotionEnds = new Date('2026-09-01T00:00:00-06:00');
+  if (new Date() >= promotionEnds) return '';
+  return `
+    <aside class="seasonal-promo" aria-label="Promoción julio y agosto">
+      <div>
+        <span>Promoción julio y agosto</span>
+        <strong>Al contratar un servicio con EMC, te regalamos un galón de pintura del color de tu elección.</strong>
+      </div>
+      <small>Color sujeto a disponibilidad y compatible con el trabajo contratado. No acumulable con otras promociones.</small>
+    </aside>
   `;
 }
 
@@ -843,7 +860,7 @@ function stepProjectConditions() {
           ${select('diagnostic.colorChange', 'Cambio de color', ['Similar', 'Claro a oscuro', 'Oscuro a claro'])}
           ${select('diagnostic.accessDifficulty', 'Acceso al área', ['Normal', 'Escalera', 'Andamio o acceso especial', 'No estoy seguro'])}
         </div>
-        <div class="privacy-inline"><strong>Sin fotografías.</strong> Puedes obtener el estimado ahora y enviarlas después sólo si hacen falta.</div>
+        <div class="privacy-inline"><strong>Sin fotografías obligatorias.</strong> Puedes obtener el estimado ahora. Si después autorizas compartir una imagen clara del espacio, EMC puede orientarte con el color y preparar un render preliminar; el tono final se confirma con una referencia física.</div>
       </div>
       ${navActions('Ver mi precio')}
     </div>
