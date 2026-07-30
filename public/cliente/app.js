@@ -240,6 +240,20 @@ function whatsappUrl(text = 'Hola, quiero una cotización de pintura con EMC Pin
   return phone ? `https://wa.me/${phone}?text=${message}` : '';
 }
 
+function reviewWhatsappText() {
+  return [
+    'Hola, quiero solicitar una revisión sin compromiso para un trabajo de pintura con EMC.',
+    'Tipo de espacio (casa, oficina, local u otro):',
+    'Zona o colonia aproximada:',
+    'Interior, exterior o fachada:',
+    'Medidas aproximadas, si las tengo:',
+    'Estado del muro o superficie:',
+    'Fecha en que me gustaría realizarlo:',
+    'Quiero orientación para elegir el color: Sí / No',
+    'Puedo compartir fotografías autorizadas del espacio: Sí / No'
+  ].join('\n');
+}
+
 function otherServiceWhatsappText(service) {
   const c = state.quote.client || {};
   return [
@@ -694,7 +708,7 @@ function home() {
                 <strong>Calcular mi proyecto</strong>
                 <small>Precio antes de dejar tus datos</small>
               </button>
-              ${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.') ? `<a class="btn hero-whatsapp" href="${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.')}" target="_blank" rel="noopener"><strong>Hablar por WhatsApp</strong><small>Atención directa con EMC</small></a>` : ''}
+              ${whatsappUrl(reviewWhatsappText()) ? `<a class="btn hero-whatsapp" href="${whatsappUrl(reviewWhatsappText())}" target="_blank" rel="noopener" data-review-interest="home"><strong>Pedir revisión sin compromiso</strong><small>Te orientamos por WhatsApp</small></a>` : ''}
             </div>
             ${state.savedDraft ? `
               <div class="quote-resume-card">
@@ -2511,6 +2525,9 @@ function bind() {
       track('whatsapp_click', { detail: link.textContent.trim().slice(0, 120) });
       if (link.dataset.renderInterest) {
         track('render_interest', { detail: link.dataset.renderInterest });
+      }
+      if (link.dataset.reviewInterest) {
+        track('review_interest', { detail: link.dataset.reviewInterest });
       }
     });
   });

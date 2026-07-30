@@ -74,6 +74,7 @@ async function loadSummary(clave) {
   setText('quoteStarts', totals.quoteStarts || 0);
   setText('quoteSent', totals.quoteSent || 0);
   setText('whatsappClicks', totals.whatsappClicks || 0);
+  setText('reviewInterests', totals.reviewInterests || 0);
 
   renderList('topPages', data.topPages || [], 'Sin páginas registradas');
   renderList('topReferrers', data.topReferrers || [], 'Sin origen registrado');
