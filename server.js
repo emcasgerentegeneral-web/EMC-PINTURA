@@ -337,6 +337,7 @@ function cleanAnalyticsEvent(req, body = {}) {
   const allowedTypes = new Set([
     'pageview',
     'quote_start',
+    'quote_resume',
     'quote_step',
     'step_1_complete',
     'price_view',
@@ -470,6 +471,7 @@ function analyticsSummary(events) {
       last7Visits: last7.filter(event => event.type === 'pageview').length,
       last30Visits: last30.filter(event => event.type === 'pageview').length,
       quoteStarts: events.filter(event => event.type === 'quote_start').length,
+      quoteResumes: events.filter(event => event.type === 'quote_resume').length,
       priceViews: events.filter(event => event.type === 'price_view').length,
       quoteSent: events.filter(event => event.type === 'quote_sent').length,
       leads: events.filter(event => event.type === 'lead_submit').length,

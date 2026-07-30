@@ -50,6 +50,23 @@ function initialQuote() {
   };
 }
 
+const QUOTE_DRAFT_KEY = 'emc_quote_draft_v1';
+const QUOTE_DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+function readQuoteDraft() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(QUOTE_DRAFT_KEY) || 'null');
+    if (!saved?.savedAt || Date.now() - new Date(saved.savedAt).getTime() > QUOTE_DRAFT_MAX_AGE_MS) {
+      localStorage.removeItem(QUOTE_DRAFT_KEY);
+      return null;
+    }
+    return saved;
+  } catch (error) {
+    localStorage.removeItem(QUOTE_DRAFT_KEY);
+    return null;
+  }
+}
+
 const state = {
   config: null,
   view: 'home',
@@ -62,7 +79,8 @@ const state = {
   showServiceOptions: false,
   showCrewConfig: false,
   quote: initialQuote(),
-  lastSavedQuote: null
+  lastSavedQuote: null,
+  savedDraft: readQuoteDraft()
 };
 
 const analyticsSessionId = (() => {
@@ -297,6 +315,7 @@ function setView(view, step = state.step) {
   state.view = view;
   state.step = step;
   state.modal = null;
+  if (view === 'quote') persistQuoteDraft();
   render();
   track(view === 'quote' ? 'quote_step' : 'pageview', { detail: view, step: view === 'quote' ? step + 1 : null });
   scrollToPageStart();
@@ -306,6 +325,7 @@ function setView(view, step = state.step) {
 
 function startNewQuote() {
   track('quote_start', { detail: 'calcular ahora' });
+  clearQuoteDraft();
   state.quote = initialQuote();
   state.step = 0;
   state.modal = null;
@@ -317,6 +337,56 @@ function startNewQuote() {
   setView('quote', 0);
 }
 
+function persistQuoteDraft() {
+  try {
+    const draft = {
+      savedAt: new Date().toISOString(),
+      step: Math.max(0, Math.min(2, Number(state.step || 0))),
+      propertyType: state.quote.client.propertyType,
+      project: { ...state.quote.project },
+      diagnostic: { ...state.quote.diagnostic },
+      selectedLevel: state.quote.service.selectedLevel || ''
+    };
+    localStorage.setItem(QUOTE_DRAFT_KEY, JSON.stringify(draft));
+    state.savedDraft = draft;
+  } catch (error) {
+    // El almacenamiento local nunca debe impedir que el cliente cotice.
+  }
+}
+
+function clearQuoteDraft() {
+  try {
+    localStorage.removeItem(QUOTE_DRAFT_KEY);
+  } catch (error) {
+    // Ignorar cuando el navegador bloquea almacenamiento local.
+  }
+  state.savedDraft = null;
+}
+
+function resumeQuoteDraft() {
+  const draft = readQuoteDraft();
+  if (!draft) {
+    clearQuoteDraft();
+    return startNewQuote();
+  }
+  const fresh = initialQuote();
+  state.quote = {
+    ...fresh,
+    client: { ...fresh.client, propertyType: draft.propertyType || fresh.client.propertyType },
+    project: { ...fresh.project, ...(draft.project || {}) },
+    diagnostic: { ...fresh.diagnostic, ...(draft.diagnostic || {}) },
+    service: { ...fresh.service, selectedLevel: draft.selectedLevel || '' },
+    photos: []
+  };
+  state.savedDraft = draft;
+  state.photoAnalysis = null;
+  state.photoAnalysisSignature = '';
+  state.showServiceOptions = false;
+  state.showCrewConfig = false;
+  track('quote_resume', { detail: `paso ${Number(draft.step || 0) + 1}` });
+  setView('quote', Math.max(0, Math.min(2, Number(draft.step || 0))));
+}
+
 function update(path, value) {
   const keys = path.split('.');
   let target = state.quote;
@@ -324,6 +394,7 @@ function update(path, value) {
     target = target[key];
   });
   target[keys.at(-1)] = value;
+  persistQuoteDraft();
 }
 
 async function loadConfig() {
@@ -625,6 +696,12 @@ function home() {
               </button>
               ${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.') ? `<a class="btn hero-whatsapp" href="${whatsappUrl('Hola, prefiero cotizar pintura directamente por WhatsApp con EMC.')}" target="_blank" rel="noopener"><strong>Hablar por WhatsApp</strong><small>Atención directa con EMC</small></a>` : ''}
             </div>
+            ${state.savedDraft ? `
+              <div class="quote-resume-card">
+                <div><strong>Tienes un cálculo pendiente.</strong><span>Conservamos únicamente medidas y selección del proyecto en este dispositivo.</span></div>
+                <button class="btn" data-action="resume-quote" type="button">Retomar mi cálculo</button>
+              </div>
+            ` : ''}
             <div class="benefits" aria-label="Ventajas del cotizador">
               <span>Sin fotografías obligatorias</span>
               <span>Estimado inmediato</span>
@@ -2165,6 +2242,7 @@ function bind() {
       const action = button.dataset.action;
       if (action === 'home') setView('home', 0);
       if (action === 'quote') startNewQuote();
+      if (action === 'resume-quote') resumeQuoteDraft();
       if (action === 'work') {
         track('collaborator_start', { detail: 'red emc' });
         setView('work', 0);
@@ -2270,6 +2348,7 @@ function bind() {
       state.quote.service.selectedLevel = level;
       state.quote.service.riskOverrideAccepted = true;
       state.quote.service.paintSupply = 'cliente';
+      persistQuoteDraft();
       track('package_selected', { detail: level });
       render();
     });
@@ -2565,6 +2644,7 @@ async function acceptQuote() {
   track('lead_submit', { detail: result.folio || 'lead guardado' });
   track('quote_sent', { detail: state.lastSavedQuote.folio || 'cotizacion enviada' });
   state.quote = initialQuote();
+  clearQuoteDraft();
   state.photoAnalysis = null;
   state.photoAnalysisSignature = '';
   state.showServiceOptions = false;

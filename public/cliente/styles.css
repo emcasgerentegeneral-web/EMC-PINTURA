@@ -4044,6 +4044,41 @@ body {
   background: rgba(67, 214, 163, 0.14);
 }
 
+.quote-resume-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 212, 71, 0.38);
+  border-radius: 14px;
+  background: rgba(255, 212, 71, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.quote-resume-card > div {
+  display: grid;
+  gap: 3px;
+}
+
+.quote-resume-card strong {
+  color: #fff;
+  font-size: 14px;
+}
+
+.quote-resume-card span {
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 11px;
+}
+
+.quote-resume-card .btn {
+  min-height: 42px;
+  padding: 9px 14px;
+  background: var(--emc-sun);
+  color: var(--emc-ink);
+  white-space: nowrap;
+}
+
 .home-premium .benefits {
   width: auto;
   max-width: none;
@@ -5011,6 +5046,15 @@ body {
 
   .hero-actions,
   .hero-actions .btn {
+    width: 100%;
+  }
+
+  .quote-resume-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .quote-resume-card .btn {
     width: 100%;
   }
 
