@@ -66,7 +66,10 @@ function pageHtml({ location, service, intent, fileSlug, isTargetLocation }) {
   const title = `${titleCase(service)} en ${location} | EMC Pintura`;
   const serviceZone = zoneCopy(location);
   const description = `Conoce cuanto cuesta ${intent} en ${location}, Tabasco. EMC Pintura atiende Centro, Villahermosa, Nacajuca, Jalpa de Mendez y Cunduacan con estimado por WhatsApp.`;
-  const robots = isTargetLocation ? 'index,follow' : 'noindex,follow';
+  const isWaterproofing = service.includes('impermeabilizar');
+  const serviceLanding = isWaterproofing ? '/impermeabilizacion-villahermosa/' : '/pintura-villahermosa/';
+  const robots = 'noindex,follow';
+  const campaign = `?utm_source=seo&utm_medium=organic&utm_campaign=${fileSlug}`;
   const serviceNotice = isTargetLocation
     ? `<p>La atencion principal de EMC Pintura se concentra en Centro/Villahermosa, Nacajuca, Jalpa de Mendez y Cunduacan. Asi podemos revisar mejor fotos, ubicacion, alcance y tiempos antes de confirmar una cotizacion profesional.</p>`
     : `<p>Actualmente EMC Pintura enfoca su atencion principal en Centro/Villahermosa, Nacajuca, Jalpa de Mendez y Cunduacan. Si tu proyecto esta fuera de estas zonas, puedes dejar tus datos y EMC valida si existe disponibilidad antes de confirmar.</p>`;
@@ -78,7 +81,7 @@ function pageHtml({ location, service, intent, fileSlug, isTargetLocation }) {
     <title>${title}</title>
     <meta name="description" content="${description}">
     <meta name="robots" content="${robots}">
-    <link rel="canonical" href="${siteUrl}/seo/${fileSlug}/">
+    <link rel="canonical" href="${siteUrl}${serviceLanding}">
     <style>
       :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --navy:#071d36; --yellow:#ffd21f; --line:#d9e2ef; --muted:#526174; }
       * { box-sizing: border-box; }
@@ -109,8 +112,8 @@ function pageHtml({ location, service, intent, fileSlug, isTargetLocation }) {
       <h1>${titleCase(service)} en ${location}: calcula tu precio aproximado</h1>
       <p class="lead">EMC Pintura te ayuda a estimar cuanto cuesta ${intent} en ${serviceZone}, con mano de obra, preparacion, materiales opcionales y seguimiento por WhatsApp.</p>
       <div class="cta-row">
-        <a class="button" href="/cliente/?start=quote">Calcular ahora</a>
-        <a class="button secondary" href="/cliente/?start=quote">Pedir cotizacion profesional</a>
+        <a class="button" href="${serviceLanding}${campaign}">${isWaterproofing ? 'Revisar mi azotea' : 'Cotizar pintura'}</a>
+        <a class="button secondary" href="${serviceLanding}${campaign}">Pedir cotizacion profesional</a>
       </div>
     </header>
     <main>
@@ -118,7 +121,7 @@ function pageHtml({ location, service, intent, fileSlug, isTargetLocation }) {
         <h2>Cuanto cuesta ${intent} en ${location}</h2>
         <p>El precio depende de los metros cuadrados, estado de la superficie, altura, acceso, preparacion necesaria, numero de manos y si EMC suministra pintura y sellador. Por eso una cotizacion responsable no debe ser solo una cifra suelta.</p>
         ${serviceNotice}
-        <p>Con la calculadora de EMC Pintura puedes capturar datos del proyecto, subir fotos y obtener un total preliminar antes de solicitar la revision final por WhatsApp.</p>
+        <p>${isWaterproofing ? 'Con EMC puedes solicitar una revision inicial por zona, metros aproximados y fotografias antes de confirmar el sistema de impermeabilizacion.' : 'Con la calculadora de EMC Pintura puedes obtener un estimado de preparacion y mano de obra antes de solicitar la revision final por WhatsApp.'}</p>
       </section>
       <section>
         <h2>Que incluye una cotizacion EMC</h2>
@@ -145,7 +148,7 @@ function pageHtml({ location, service, intent, fileSlug, isTargetLocation }) {
       <section>
         <h2>Calcula gratis en menos de 60 segundos</h2>
         <p>Si estas comparando precios para ${service} en ${location}, empieza con un estimado claro. Despues EMC valida fotos, medidas y agenda para convertirlo en cotizacion profesional.</p>
-        <a class="button" href="/cliente/?start=quote">Calcular precio con EMC Pintura</a>
+        <a class="button" href="${serviceLanding}${campaign}">${isWaterproofing ? 'Solicitar revision de azotea' : 'Calcular precio con EMC Pintura'}</a>
       </section>
     </main>
     <footer>EMC Pintura · Servicios de pintura e impermeabilizacion en Tabasco</footer>
@@ -174,7 +177,8 @@ for (const location of locations) {
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${siteUrl}/cliente/</loc></url>
-${pages.map(page => `  <url><loc>${siteUrl}${page}</loc></url>`).join('\n')}
+  <url><loc>${siteUrl}/pintura-villahermosa/</loc></url>
+  <url><loc>${siteUrl}/impermeabilizacion-villahermosa/</loc></url>
 </urlset>
 `;
 
@@ -184,4 +188,4 @@ Allow: /
 Sitemap: ${siteUrl}/sitemap.xml
 `);
 
-console.log(`Generated ${pages.length} target SEO pages and ${archivedLocations.length * services.length} archived noindex pages.`);
+console.log(`Generated ${locations.length * services.length} compatibility pages as noindex and two focused service landing pages in the sitemap.`);
