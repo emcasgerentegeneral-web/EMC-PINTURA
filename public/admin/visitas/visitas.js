@@ -22,6 +22,8 @@ function eventLabel(type) {
     quote_start: 'Inició cotización',
     quote_step: 'Paso cotizador',
     quote_sent: 'Cotización enviada',
+    lead_submit: 'Prospecto guardado',
+    lead_fallback_whatsapp: 'Respaldo por WhatsApp',
     whatsapp_click: 'WhatsApp',
     collaborator_start: 'Red EMC',
     collaborator_sent: 'Colaborador enviado'
@@ -71,6 +73,7 @@ async function loadSummary(clave) {
   setText('todayPeople', totals.todayPeople || 0);
   setText('last7Visits', totals.last7Visits || 0);
   setText('last30Visits', totals.last30Visits || 0);
+  setText('crawlerVisits', totals.crawlerVisits || 0);
   setText('quoteStarts', totals.quoteStarts || 0);
   setText('quoteSent', totals.quoteSent || 0);
   setText('whatsappClicks', totals.whatsappClicks || 0);
