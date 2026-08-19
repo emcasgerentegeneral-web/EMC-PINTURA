@@ -242,15 +242,20 @@ function whatsappUrl(text = 'Hola, quiero una cotización de pintura con EMC Pin
 
 function reviewWhatsappText() {
   return [
-    'Hola, quiero solicitar una revisión sin compromiso para un trabajo de pintura con EMC.',
-    'Tipo de espacio (casa, oficina, local u otro):',
-    'Zona o colonia aproximada:',
-    'Interior, exterior o fachada:',
-    'Medidas aproximadas, si las tengo:',
-    'Estado del muro o superficie:',
-    'Fecha en que me gustaría realizarlo:',
-    'Quiero orientación para elegir el color: Sí / No',
-    'Puedo compartir fotografías autorizadas del espacio: Sí / No'
+    'Hola, quiero cotizar un trabajo de pintura con EMC.',
+    'Mi zona o colonia es:',
+    'El trabajo es interior, exterior o fachada:',
+    'Puedo enviar fotos: Sí / No'
+  ].join('\n');
+}
+
+function waterproofingWhatsappText() {
+  return [
+    'Hola, quiero una revisión para impermeabilizar mi azotea con EMC.',
+    'Mi zona o colonia es:',
+    'La superficie aproximada es:',
+    'Tengo filtraciones o humedad: Sí / No / No estoy seguro',
+    'Puedo enviar fotos: Sí / No'
   ].join('\n');
 }
 
@@ -694,21 +699,22 @@ function calculate() {
 }
 
 function home() {
+  const waterproofingUrl = whatsappUrl(waterproofingWhatsappText());
   return `
     <section class="home home-premium">
       <div class="home-card">
         <div class="hero-layout">
           <div class="hero-copy">
             <img class="brand-logo" src="/assets/emc-logo.jpg" alt="EMC Pintura">
-            <p class="division">Cotización inteligente de pintura · Tabasco</p>
-            <h1>Un gran acabado comienza con un precio claro.</h1>
-            <p class="home-tagline">Calcula una inversión preliminar para pintar tu casa o negocio. Primero conoces el precio; después decides si quieres continuar.</p>
+            <p class="division">Pintura e impermeabilización · Villahermosa</p>
+            <h1>Evita que el deterioro le quite valor a tu propiedad.</h1>
+            <p class="home-tagline">Reparamos la imagen de fachadas, interiores y azoteas con un alcance claro y seguimiento directo por WhatsApp.</p>
             <div class="hero-actions">
               <button class="btn btn-primary btn-hero" data-action="quote">
-                <strong>Calcular mi proyecto</strong>
-                <small>Precio antes de dejar tus datos</small>
+                <strong>Cotizar pintura</strong>
+                <small>Obtén un estimado sin dejar datos</small>
               </button>
-              ${whatsappUrl(reviewWhatsappText()) ? `<a class="btn hero-whatsapp" href="${whatsappUrl(reviewWhatsappText())}" target="_blank" rel="noopener" data-review-interest="home"><strong>Pedir revisión sin compromiso</strong><small>Te orientamos por WhatsApp</small></a>` : ''}
+              ${waterproofingUrl ? `<a class="btn hero-whatsapp" href="${waterproofingUrl}" target="_blank" rel="noopener" data-other-service="Impermeabilización"><strong>Cotizar impermeabilización</strong><small>Revisión rápida por WhatsApp</small></a>` : ''}
             </div>
             ${state.savedDraft ? `
               <div class="quote-resume-card">
@@ -717,23 +723,25 @@ function home() {
               </div>
             ` : ''}
             <div class="benefits" aria-label="Ventajas del cotizador">
-              <span>Sin fotografías obligatorias</span>
-              <span>Estimado inmediato</span>
-              <span>Sin compromiso</span>
-              <span>Asesoría de color y render preliminar</span>
+              <span>Trabajos reales en Tabasco</span>
+              <span>Cotización por escrito</span>
+              <span>Fotos opcionales</span>
+              <span>Atención directa por WhatsApp</span>
             </div>
           </div>
           <aside class="hero-preview" aria-label="Resumen del proceso">
             <span class="hero-preview-label">Experiencia EMC</span>
-            <strong>De la idea al presupuesto en 3 pasos.</strong>
+            <strong>De tu problema a una solución clara.</strong>
             <div class="hero-preview-list">
-              <span><b>01</b> Medidas aproximadas</span>
-              <span><b>02</b> Comparación de paquetes</span>
-              <span><b>03</b> Folio y seguimiento</span>
+              <span><b>01</b> Cuéntanos qué se deterioró</span>
+              <span><b>02</b> Recibe un alcance preliminar</span>
+              <span><b>03</b> Confirma por WhatsApp</span>
             </div>
             <small>EMC confirma medidas, alcance y agenda antes de iniciar.</small>
           </aside>
         </div>
+        ${serviceDecisionCards(waterproofingUrl)}
+        ${homeProof()}
         ${seasonalPromotion()}
         ${colorRenderCta()}
         ${homeProcess()}
@@ -750,6 +758,39 @@ function home() {
         <span>Jalpa de Méndez</span>
         <span>Cunduacán</span>
       </div>
+    </section>
+  `;
+}
+
+function serviceDecisionCards(waterproofingUrl) {
+  return `
+    <section class="service-decision" aria-label="Elige el servicio que necesitas">
+      <div class="service-decision-heading">
+        <span>Elige el problema que quieres resolver</span>
+        <strong>Dos servicios, dos rutas claras.</strong>
+      </div>
+      <div class="service-decision-grid">
+        <article class="service-decision-card">
+          <img src="/assets/trabajo-pintura-antes-despues.jpg" alt="Antes y después de pintura exterior realizada por EMC" loading="lazy">
+          <div><span>Pintura</span><strong>La fachada se ve vieja, manchada o descuidada</strong><p>Calcula mano de obra y preparación según los metros y el estado del muro.</p></div>
+          <button class="btn btn-primary" data-action="quote" type="button">Calcular pintura</button>
+        </article>
+        <article class="service-decision-card">
+          <img src="/assets/trabajo-impermeabilizacion.jpg" alt="Trabajo real de impermeabilización de azotea realizado por EMC" loading="lazy">
+          <div><span>Impermeabilización</span><strong>La azotea necesita protección antes de las lluvias</strong><p>Solicita revisión por fotos para identificar superficie, filtraciones y acceso.</p></div>
+          ${waterproofingUrl ? `<a class="btn btn-primary" href="${waterproofingUrl}" target="_blank" rel="noopener" data-other-service="Impermeabilización">Revisar mi azotea</a>` : ''}
+        </article>
+      </div>
+    </section>
+  `;
+}
+
+function homeProof() {
+  return `
+    <section class="home-proof" aria-label="Evidencia y compromisos de EMC">
+      <div><span>Trabajo real</span><strong>Antes y después verificable</strong><small>Usamos proyectos ejecutados por EMC, no imágenes de catálogo.</small></div>
+      <div><span>Alcance claro</span><strong>Precio por escrito</strong><small>Separamos preparación, mano de obra y materiales para evitar sorpresas.</small></div>
+      <div><span>Servicio local</span><strong>Villahermosa y municipios cercanos</strong><small>Confirmamos zona, medidas y agenda antes de comenzar.</small></div>
     </section>
   `;
 }
@@ -942,7 +983,7 @@ function stepProjectConditions() {
   const areaPath = p.applicationType === 'Interior' ? 'project.interiorSquareMeters' : p.applicationType === 'Exterior' ? 'project.exteriorSquareMeters' : '';
   return `
     <div class="card visual-card project-visual premium-step-card">
-      ${workVisual('/assets/emc-uniforme-exterior.png', 'Calcula con medidas aproximadas', 'No necesitas tener un plano. EMC confirmará las medidas antes de iniciar el trabajo.')}
+      ${workVisual('/assets/emc-uniforme-exterior-optimizada.jpg', 'Calcula con medidas aproximadas', 'No necesitas tener un plano. EMC confirmará las medidas antes de iniciar el trabajo.')}
       <div class="step-heading">
         <span class="eyebrow">Paso 1 · Tu proyecto</span>
         <h2>Cuéntanos qué quieres transformar.</h2>
@@ -962,8 +1003,7 @@ function stepProjectConditions() {
             ${input('project.interiorSquareMeters', 'm² interiores', 'number', 'min="1" inputmode="decimal" required placeholder="Ej. 100"')}
             ${input('project.exteriorSquareMeters', 'm² exteriores', 'number', 'min="1" inputmode="decimal" required placeholder="Ej. 60"')}
           ` : ''}
-          ${input('project.floors', 'Número de plantas', 'number', 'min="1" max="20" inputmode="numeric" placeholder="Ej. 1"')}
-          ${input('project.heightMeters', 'Altura aproximada (opcional)', 'number', 'min="1" max="15" step="0.1" inputmode="decimal" placeholder="Ej. 2.8"')}
+          ${select('diagnostic.surfaceCondition', 'Estado de la superficie', ['Buen estado', 'Resanes ligeros', 'Resanes fuertes'])}
         </div>
         ${areaPath ? `
           <div class="area-presets">
@@ -975,19 +1015,17 @@ function stepProjectConditions() {
           </div>
         ` : ''}
       </div>
-      <div class="form-section">
-        <div class="form-section-heading">
-          <span>02</span>
-          <div><strong>Condición de la superficie</strong><small>Esto determina la preparación recomendada.</small></div>
-        </div>
+      <details class="optional-details">
+        <summary>Agregar detalles opcionales para afinar el estimado</summary>
         <div class="form-grid">
-          ${select('diagnostic.surfaceCondition', 'Estado de la superficie', ['Buen estado', 'Resanes ligeros', 'Resanes fuertes'])}
           ${select('diagnostic.moisture', 'Humedad, moho o salitre', ['No visible', 'Humedad, moho o salitre', 'No estoy seguro'])}
           ${select('diagnostic.colorChange', 'Cambio de color', ['Similar', 'Claro a oscuro', 'Oscuro a claro'])}
           ${select('diagnostic.accessDifficulty', 'Acceso al área', ['Normal', 'Escalera', 'Andamio o acceso especial', 'No estoy seguro'])}
+          ${input('project.floors', 'Número de plantas', 'number', 'min="1" max="20" inputmode="numeric" placeholder="Ej. 1"')}
+          ${input('project.heightMeters', 'Altura aproximada', 'number', 'min="1" max="15" step="0.1" inputmode="decimal" placeholder="Ej. 2.8"')}
         </div>
         <div class="privacy-inline"><strong>Sin fotografías obligatorias.</strong> Puedes obtener el estimado ahora. Si después autorizas compartir una imagen clara del espacio, EMC puede orientarte con el color y preparar un render preliminar; el tono final se confirma con una referencia física.</div>
-      </div>
+      </details>
       ${navActions('Ver mi precio')}
     </div>
   `;
@@ -1004,10 +1042,6 @@ function packageCard(key, recommendedLevel) {
       <p class="package-intent">${level.short}</p>
       <div class="package-total">${money(range.minimum)} a ${money(range.maximum)}</div>
       <strong class="package-rate">${money(range.rate)}/m² · ${level.coats} manos</strong>
-      <div class="package-materials-note" role="note">
-        <strong>Pintura y materiales no incluidos</strong>
-        <span>Se cotizan por separado según marca, color y rendimiento.</span>
-      </div>
       <small class="package-scope">${level.scope}</small>
       <ul class="clean-list compact">${level.includes.slice(0, 6).map(item => `<li>${item}</li>`).join('')}</ul>
       <button class="btn ${selected ? 'btn-dark' : 'btn-primary'}" data-select-package="${key}" type="button" aria-pressed="${selected}">${selected ? 'Paquete elegido' : `Elegir ${level.label}`}</button>
@@ -1023,7 +1057,7 @@ function stepPricePackages(calc) {
       <div class="quote-total-hero preliminary-price">
         <span>Tu inversión preliminar</span>
         <strong>${money(range.minimum)} a ${money(range.maximum)}</strong>
-        <small>${projectSquareMeters()} m² · ${state.quote.project.applicationType} · preparación y mano de obra. La pintura se cotiza por separado.</small>
+        <small>${projectSquareMeters()} m² · ${state.quote.project.applicationType} · preparación y mano de obra.</small>
       </div>
       <div class="step-heading price-heading">
         <span class="eyebrow">Paso 2 · Elige con claridad</span>
@@ -1037,8 +1071,8 @@ function stepPricePackages(calc) {
         <span>Presupuesto por escrito</span><span>Protección de pisos y mobiliario</span><span>Limpieza al finalizar</span><span>Factura disponible</span><span>Seguimiento por WhatsApp</span><span>Garantía especificada en la cotización</span>
       </div>
       <div class="price-clarity">
-        <strong>Precio transparente desde el inicio</strong>
-        <span>No incluye pintura, daños ocultos ni trabajos fuera del alcance elegido. Cualquier ajuste se explica y confirma antes de comenzar.</span>
+        <strong>Un estimado útil, sin esconder conceptos</strong>
+        <span>Este cálculo cubre preparación y mano de obra. En la revisión final puedes pedir que EMC agregue pintura y materiales según la marca y el color elegidos.</span>
       </div>
       ${navActions('Continuar con mis datos')}
     </div>
@@ -1064,16 +1098,21 @@ function stepContactAndSend(calc) {
             ${input('client.phone', 'WhatsApp', 'tel', 'required inputmode="tel" autocomplete="tel" placeholder="10 dígitos"')}
             ${input('client.address', 'Colonia o zona', 'text', 'required autocomplete="address-level3" placeholder="Ej. Atasta"')}
             ${select('client.city', 'Ciudad o municipio', ['Villahermosa / Centro', 'Cunduacán', 'Jalpa de Méndez', 'Nacajuca', 'Otro'])}
-            ${input('client.email', 'Correo (opcional)', 'email', 'autocomplete="email" placeholder="tu@correo.com"')}
-            ${input('client.company', 'Empresa o negocio (opcional)', 'text', 'autocomplete="organization"')}
             ${select('client.urgency', 'Cuándo lo necesitas', ['Urgente', 'Esta semana', 'Este mes', 'Estoy comparando precios'])}
-            <label>Factura
-              <select data-path="service.invoice">
-                <option value="false" ${state.quote.service.invoice ? '' : 'selected'}>Sin factura</option>
-                <option value="true" ${state.quote.service.invoice ? 'selected' : ''}>Con factura + IVA</option>
-              </select>
-            </label>
           </div>
+          <details class="optional-details compact-details">
+            <summary>Agregar correo, empresa o factura (opcional)</summary>
+            <div class="form-grid">
+              ${input('client.email', 'Correo', 'email', 'autocomplete="email" placeholder="tu@correo.com"')}
+              ${input('client.company', 'Empresa o negocio', 'text', 'autocomplete="organization"')}
+              <label>Factura
+                <select data-path="service.invoice">
+                  <option value="false" ${state.quote.service.invoice ? '' : 'selected'}>Sin factura</option>
+                  <option value="true" ${state.quote.service.invoice ? 'selected' : ''}>Con factura + IVA</option>
+                </select>
+              </label>
+            </div>
+          </details>
           <label>Comentarios o solicitud de visita
             <textarea data-path="observations" placeholder="Ej. Me interesa una visita para confirmar medidas">${state.quote.observations || ''}</textarea>
           </label>
@@ -2141,7 +2180,7 @@ function success() {
           <span>Inversión preliminar</span>
           <strong>${money(range.minimum)} a ${money(range.maximum)}</strong>
           <small>${quote.client?.name || ''} · ${quote.client?.serviceNeed || 'Pintura'} · ${quote.client?.city || '-'} · ${quote.project?.squareMeters || '-'} m²</small>
-          <small>Pintura y materiales no incluidos; se cotizan por separado.</small>
+          <small>La revisión final puede agregar pintura y materiales según tu elección.</small>
         </div>
         ${whatsapp ? `<a class="btn btn-dark" href="${whatsapp}" target="_blank" rel="noopener">Continuar por WhatsApp</a>` : ''}
         <button class="btn btn-ghost" data-action="copy-summary">Copiar resumen</button>
