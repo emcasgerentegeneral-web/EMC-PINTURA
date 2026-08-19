@@ -2298,7 +2298,8 @@ function bind() {
       if (action === 'accept') {
         button.disabled = true;
         try {
-          await acceptQuote();
+          const saved = await acceptQuote();
+          if (!saved) button.disabled = false;
         } catch (error) {
           button.disabled = false;
           alert(error.message || 'No se pudo guardar la cotización. Intenta nuevamente.');
@@ -2614,7 +2615,11 @@ async function analyzePhotos(options = {}) {
 }
 
 async function acceptQuote() {
-  if (!validateStep()) return alert('Faltan algunos datos básicos. Si no sabes una medida, escribe un aproximado y EMC lo confirma por WhatsApp.');
+  const message = validationMessage();
+  if (message) {
+    alert(message);
+    return false;
+  }
   const calc = calculate();
   const photoReview = {
     count: state.quote.photos.length,
@@ -2667,6 +2672,7 @@ async function acceptQuote() {
   state.showServiceOptions = false;
   state.showCrewConfig = false;
   setView('success', 0);
+  return true;
 }
 
 async function sendCollaborator() {
