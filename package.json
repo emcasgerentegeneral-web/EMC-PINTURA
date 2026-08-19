@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "start:public": "PUBLIC_CLIENT_ONLY=true node server.js",
-    "check": "node --check server.js && node --check public/cliente/app.js"
+    "check": "node --check server.js && node --check public/cliente/app.js && node --check public/servicios.js"
   },
   "keywords": [
     "emc",

@@ -345,6 +345,7 @@ function cleanAnalyticsEvent(req, body = {}) {
     'photo_upload',
     'quote_sent',
     'lead_submit',
+    'lead_fallback_whatsapp',
     'visit_booked',
     'sale_closed',
     'whatsapp_click',
@@ -457,12 +458,18 @@ function topCounts(events, mapper, limit = 8) {
     .map(([label, count]) => ({ label, count }));
 }
 
+function isCrawlerEvent(event) {
+  return /bot|crawler|spider|facebookexternalhit|meta-externalagent|meta-externalfetcher|google-inspectiontool|preview|slurp/i.test(String(event.userAgent || ''));
+}
+
 function analyticsSummary(events) {
+  const humanEvents = events.filter(event => !isCrawlerEvent(event));
+  const crawlerEvents = events.filter(isCrawlerEvent);
   const now = new Date();
-  const todayEvents = events.filter(event => sameDay(new Date(event.createdAt), now));
-  const last7 = events.filter(event => Date.now() - new Date(event.createdAt).getTime() <= 7 * 24 * 60 * 60 * 1000);
-  const last30 = events.filter(event => Date.now() - new Date(event.createdAt).getTime() <= 30 * 24 * 60 * 60 * 1000);
-  const pageviews = events.filter(event => event.type === 'pageview');
+  const todayEvents = humanEvents.filter(event => sameDay(new Date(event.createdAt), now));
+  const last7 = humanEvents.filter(event => Date.now() - new Date(event.createdAt).getTime() <= 7 * 24 * 60 * 60 * 1000);
+  const last30 = humanEvents.filter(event => Date.now() - new Date(event.createdAt).getTime() <= 30 * 24 * 60 * 60 * 1000);
+  const pageviews = humanEvents.filter(event => event.type === 'pageview');
 
   return {
     updatedAt: new Date().toISOString(),
@@ -471,16 +478,17 @@ function analyticsSummary(events) {
       todayPeople: uniqueCount(todayEvents, 'sessionId') || uniqueCount(todayEvents, 'ipHash'),
       last7Visits: last7.filter(event => event.type === 'pageview').length,
       last30Visits: last30.filter(event => event.type === 'pageview').length,
-      quoteStarts: events.filter(event => event.type === 'quote_start').length,
-      quoteResumes: events.filter(event => event.type === 'quote_resume').length,
-      priceViews: events.filter(event => event.type === 'price_view').length,
-      quoteSent: events.filter(event => event.type === 'quote_sent').length,
-      leads: events.filter(event => event.type === 'lead_submit').length,
-      whatsappClicks: events.filter(event => event.type === 'whatsapp_click').length,
-      renderInterests: events.filter(event => event.type === 'render_interest').length,
-      reviewInterests: events.filter(event => event.type === 'review_interest').length,
-      visitsBooked: events.filter(event => event.type === 'visit_booked').length,
-      salesClosed: events.filter(event => event.type === 'sale_closed').length
+      crawlerVisits: crawlerEvents.filter(event => event.type === 'pageview').length,
+      quoteStarts: humanEvents.filter(event => event.type === 'quote_start').length,
+      quoteResumes: humanEvents.filter(event => event.type === 'quote_resume').length,
+      priceViews: humanEvents.filter(event => event.type === 'price_view').length,
+      quoteSent: humanEvents.filter(event => event.type === 'quote_sent').length,
+      leads: humanEvents.filter(event => event.type === 'lead_submit').length,
+      whatsappClicks: humanEvents.filter(event => event.type === 'whatsapp_click').length,
+      renderInterests: humanEvents.filter(event => event.type === 'render_interest').length,
+      reviewInterests: humanEvents.filter(event => event.type === 'review_interest').length,
+      visitsBooked: humanEvents.filter(event => event.type === 'visit_booked').length,
+      salesClosed: humanEvents.filter(event => event.type === 'sale_closed').length
     },
     topPages: topCounts(pageviews, event => event.path),
     topReferrers: topCounts(pageviews, event => {
@@ -495,7 +503,7 @@ function analyticsSummary(events) {
       if (!event.utmCampaign && !event.utmSource) return '';
       return [event.utmSource || 'sin-fuente', event.utmCampaign || 'sin-campaña', event.utmContent || 'general'].join(' / ');
     }),
-    recent: events.slice(-60).reverse()
+    recent: humanEvents.slice(-60).reverse()
   };
 }
 
